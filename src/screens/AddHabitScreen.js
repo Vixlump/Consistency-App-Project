@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 const habitIcons = [
-  { name: 'fitness', label: 'Fitness' },
+  { name: 'fitness-center', label: 'Fitness' },
   { name: 'book', label: 'Study' },
   { name: 'leaf', label: 'Meditate' },
   { name: 'water', label: 'Water' },
