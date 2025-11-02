@@ -15,6 +15,8 @@ import StatsScreen from './src/screens/StatsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import AddHabitScreen from './src/screens/AddHabitScreen';
 import LocationPickerScreen from './src/screens/LocationPickerScreen';
+import HomeScreen from './src/screens/HomeScreen';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -55,28 +57,28 @@ export default function App() {
     <View style={styles.container}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
-          <Stack.Screen 
-            name="Login" 
+          <Stack.Screen
+            name="Login"
             component={LoginScreen}
             options={{ headerShown: false }}
           />
-          <Stack.Screen 
-            name="SignUp" 
+          <Stack.Screen
+            name="SignUp"
             component={SignUpScreen}
             options={{ headerShown: false }}
           />
-          <Stack.Screen 
-            name="Main" 
+          <Stack.Screen
+            name="Main"
             component={MainTabs}
             options={{ headerShown: false }}
           />
-          <Stack.Screen 
-            name="AddHabit" 
+          <Stack.Screen
+            name="AddHabit"
             component={AddHabitScreen}
             options={{ title: 'Add New Habit' }}
           />
-          <Stack.Screen 
-            name="LocationPicker" 
+          <Stack.Screen
+            name="LocationPicker"
             component={LocationPickerScreen}
             options={{ title: 'Select Location' }}
           />
