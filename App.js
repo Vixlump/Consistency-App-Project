@@ -5,6 +5,10 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
+import { Text } from 'react-native'; 
+import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
+
+
 
 // Import Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -17,15 +21,26 @@ import AddHabitScreen from './src/screens/AddHabitScreen';
 import LocationPickerScreen from './src/screens/LocationPickerScreen';
 import HomeScreen from './src/screens/HomeScreen';
 
-
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+import HomeActive from './assets/icons/home-active.svg';
+import HomeInactive from './assets/icons/home-inactive.svg';
+
 function MainTabs() {
+  // load Inter font
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+  });
+
+  if (!fontsLoaded) return null; // prevent render until fonts are ready
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
+
           let iconName;
 
           if (route.name === 'Today') {
@@ -46,6 +61,7 @@ function MainTabs() {
     >
       <Tab.Screen name="Today" component={TodayScreen} />
       <Tab.Screen name="Rewards" component={RewardsScreen} />
+      <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="Stats" component={StatsScreen} />
       <Tab.Screen name="Settings" component={SettingsScreen} />
     </Tab.Navigator>
