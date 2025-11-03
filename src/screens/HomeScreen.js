@@ -166,7 +166,7 @@ function HabitCard({ iconEmoji, title, subtitle, streak, imageSource, status }) 
             {isSkipped
               ? <Ionicons name="refresh-circle-outline" size={16} color="#9CA3AF" />
               // Use MaterialIcons 'touch-app' for the "In Progress" card
-              : <MaterialIcons name="touch-app" size={25} color="#9CA3AF" />
+              : <MaterialIcons name="touch-app" size={25} color="#DEDEDE" />
             }
             <Text style={cardStyles.footerText}>
               {isSkipped ? 'Tap to reset' : 'Tap to complete or skip'}
@@ -246,14 +246,15 @@ const cardStyles = StyleSheet.create({
   },
   cardTitle: {
     color: '#FFF',
-    fontSize: 22,
+    fontSize: 16,
     fontWeight: 'bold',
+    marginBottom: 4,
   },
   cardSubtitle: {
     color: '#E5E7EB',
-    fontSize: 14,
+    fontSize: 12,
     marginTop: 4,
-    lineHeight: 20,
+    lineHeight: 15,
   },
   streakBadge: {
     backgroundColor: 'rgba(255, 255, 255, 0.11)',
@@ -268,22 +269,21 @@ const cardStyles = StyleSheet.create({
   },
   streakText: {
     color: '#FFF',
-    fontSize: 14,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   footer: {
-    borderTopColor: 'rgba(55, 65, 81, 0.5)',
-    borderTopWidth: 1,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingTop: 12,
-    marginTop: 16,
+    marginBottom: 10,
   },
   footerText: {
-    color: '#9CA3AF',
+    color: '#DEDEDE',
     marginLeft: 8,
     fontSize: 12,
+    fontWeight: 'bold'
   },
 });
 
@@ -310,13 +310,14 @@ const tabStyles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 20,
-    backgroundColor: '#374151', // Dark gray
+    borderWidth: 0.5,
+    borderColor: '#FFF', 
   },
   activeTab: {
     backgroundColor: '#FFF', // Active tab is white
   },
   tabText: {
-    color: '#9CA3AF', // Inactive text is gray
+    color: '#FFF', // Inactive text is gray
     fontWeight: 'bold',
   },
   activeTabText: {
@@ -367,8 +368,8 @@ const DATES = [
 const TODOS = [
   {
     id: '1',
-    iconEmoji: '🥊',
-    title: 'Boxing',
+    // iconEmoji: '🥊',
+    title: '🥊 Boxing',
     subtitle: 'Start strong, breathe deep, and hit the day with determination!',
     streak: '3 days',
     status: 'In Progress',
@@ -376,18 +377,18 @@ const TODOS = [
   },
   {
     id: '2',
-    iconName: '📈',
-    title: 'Work',
-    subtitle: 'make today count.',
+    // iconEmoji: '📈',
+    title: '📈 Work',
+    subtitle: 'Make today count.',
     streak: '3 days',
     status: 'In Progress',
     imageSource: require('../../assets/images/work.png'),
   },
   {
     id: '3',
-    iconName: '🌳',
-    title: 'Run',
-    subtitle: '10km morning run',
+    // iconEmoji: '🌳',
+    title: '🏋🏻 Exercise',
+    subtitle: 'Stay active, stay consistent.',
     streak: '1 day',
     status: 'In Progress',
     imageSource: require('../../assets/images/run.png'),
@@ -443,12 +444,12 @@ function HomeScreen() {
         {/* Tabs (To-dos, Done, Skipped) */}
         <View style={styles.tabsContainer}>
           <TabButton
-            label="To-dos (4)"
+            label="To-dos (3)"
             isActive={selectedTab === 'To-dos'}
             onPress={() => setSelectedTab('To-dos')}
           />
           <TabButton
-            label="Done (0)"
+            label="Done (1)"
             isActive={selectedTab === 'Done'}
             onPress={() => setSelectedTab('Done')}
           />
@@ -463,7 +464,7 @@ function HomeScreen() {
         {TODOS.map((todo) => (
           <HabitCard
             key={todo.id}
-            iconName={todo.iconName}
+            iconEmoji={todo.iconEmoji}
             title={todo.title}
             subtitle={todo.subtitle}
             streak={todo.streak}
@@ -517,23 +518,26 @@ const styles = StyleSheet.create({
   },
   dateScrollerContainer: {
     paddingVertical: 20,
-    paddingHorizontal: 10,
+    paddingHorizontal: 15,
   },
   dateCircle: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#1F2937',
+    borderWidth: 3,
+    borderColor: '#222226',
+    // backgroundColor: '#1F2937',
     justifyContent: 'center',
     alignItems: 'center',
-    marginHorizontal: 6,
+    marginHorizontal: 8,
   },
   activeDateCircle: {
+    borderWidth: 0,
     backgroundColor: '#FFF',
   },
   dateNum: {
     color: '#FFF',
-    fontSize: 16,
+    fontSize: 12,
     fontWeight: 'bold',
   },
   activeDateNum: {
