@@ -325,33 +325,33 @@ const tabStyles = StyleSheet.create({
   },
 });
 
-// -----------------------------------------------------------------
-// --- 4. BottomNavBar Component ---
-// -----------------------------------------------------------------
-function BottomNavBar() {
-  return (
-    <View style={navStyles.bottomTabBar}>
-      <Text style={navStyles.placeholderText}>[Bottom Tab Bar Placeholder]</Text>
-    </View>
-  );
-}
+// // -----------------------------------------------------------------
+// // --- 4. BottomNavBar Component ---
+// // -----------------------------------------------------------------
+// function BottomNavBar() {
+//   return (
+//     <View style={navStyles.bottomTabBar}>
+//       <Text style={navStyles.placeholderText}>[Bottom Tab Bar Placeholder]</Text>
+//     </View>
+//   );
+// }
 
-// --- BottomNavBar Styles ---
-const navStyles = StyleSheet.create({
-  bottomTabBar: {
-    height: 80,
-    backgroundColor: '#111827',
-    borderTopWidth: 1,
-    borderTopColor: '#374151',
-    justifyContent: 'center',
-    alignItems: 'center',
-    flexDirection: 'row',
-  },
-  placeholderText: {
-    color: '#9CA3AF',
-    fontSize: 16,
-  },
-});
+// // --- BottomNavBar Styles ---
+// const navStyles = StyleSheet.create({
+//   bottomTabBar: {
+//     height: 80,
+//     backgroundColor: '#111827',
+//     borderTopWidth: 1,
+//     borderTopColor: '#374151',
+//     justifyContent: 'center',
+//     alignItems: 'center',
+//     flexDirection: 'row',
+//   },
+//   placeholderText: {
+//     color: '#9CA3AF',
+//     fontSize: 16,
+//   },
+// });
 
 // -----------------------------------------------------------------
 // --- 5. Data Definitions ---
@@ -479,7 +479,7 @@ function HomeScreen() {
       </ScrollView>
 
       {/* 3. Bottom Tab Bar */}
-      <BottomNavBar />
+      {/* <BottomNavBar /> */}
 
     </SafeAreaView>
   );
