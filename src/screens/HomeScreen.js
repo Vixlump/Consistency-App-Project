@@ -24,10 +24,16 @@ import { LinearGradient } from 'expo-linear-gradient'; // <-- TO THIS
 // -----------------------------------------------------------------
 const REPEAT_COUNT = 4;
 
+
 function HeaderQuoteScroll({
-  messages = ['Better everyday', 'Keep going', 'You are better than that', 'Push through it'],
-  separator = '  ✦  ',
-  speed = 60,
+  messages = [
+    'Better everyday',
+    'Keep going',
+  ],
+  // --- THIS IS THE CHANGE ---
+  // I've added more spaces on each side of the separator
+  separator = '     ✦     ', 
+  speed = 10,
 }) {
   const [contentWidth, setContentWidth] = useState(0);
   const translateX = useRef(new Animated.Value(0)).current;
@@ -61,26 +67,31 @@ function HeaderQuoteScroll({
         ]}
       >
         {Array(REPEAT_COUNT).fill(null).map((_, index) => (
-          <Text
+          
+          <View 
             key={index}
-            style={tickerStyles.text}
-            numberOfLines={1}
-            onLayout={
+            onLayout={ 
               index === 0
                 ? (e) => {
-                  const newWidth = e.nativeEvent.layout.width;
-                  if (newWidth > 0 && newWidth !== contentWidth) {
-                    setContentWidth(newWidth);
+                    const newWidth = e.nativeEvent.layout.width;
+                    if (newWidth > 0 && newWidth !== contentWidth) {
+                      setContentWidth(newWidth);
+                    }
+                    if (newWidth > 0 && !ready) {
+                      setReady(true);
+                    }
                   }
-                  if (newWidth > 0 && !ready) {
-                    setReady(true);
-                  }
-                }
                 : undefined
             }
           >
-            {line}
-          </Text>
+            <Text
+              style={tickerStyles.text}
+              numberOfLines={1}
+            >
+              {line}
+            </Text>
+          </View>
+          
         ))}
       </Animated.View>
     </View>
@@ -104,7 +115,6 @@ const tickerStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.5,
-    paddingHorizontal: 12,
   },
 });
 
