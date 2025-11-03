@@ -1,24 +1,28 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { 
-  Animated, 
-  Easing, 
-  View, 
-  Text, 
-  StyleSheet, 
-  SafeAreaView, 
+import {
+  Animated,
+  Easing,
+  View,
+  Text,
+  StyleSheet,
+  SafeAreaView,
   StatusBar,
   ScrollView,
   TouchableOpacity,
   ImageBackground // Import ImageBackground for the card
 } from 'react-native';
 
-// --- Icon Import ---
-import Ionicons from 'react-native-vector-icons/Ionicons';
+// --- Icon Imports ---
+// import MaterialIcons from '@expo/vector-icons';
+// import Ionicons from 'react-native-vector-icons/Ionicons';
+// BECAME THIS (to include both icon sets):
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient'; // <-- TO THIS
 
 // -----------------------------------------------------------------
 // --- 1. Ticker Component (HeaderQuoteScroll) ---
 // -----------------------------------------------------------------
-const REPEAT_COUNT = 4; 
+const REPEAT_COUNT = 4;
 
 function HeaderQuoteScroll({
   messages = ['Better everyday', 'Keep going', 'You are better than that', 'Push through it'],
@@ -57,21 +61,21 @@ function HeaderQuoteScroll({
         ]}
       >
         {Array(REPEAT_COUNT).fill(null).map((_, index) => (
-          <Text 
+          <Text
             key={index}
             style={tickerStyles.text}
-            numberOfLines={1} 
+            numberOfLines={1}
             onLayout={
-              index === 0 
+              index === 0
                 ? (e) => {
-                    const newWidth = e.nativeEvent.layout.width;
-                    if (newWidth > 0 && newWidth !== contentWidth) {
-                      setContentWidth(newWidth);
-                    }
-                    if (newWidth > 0 && !ready) {
-                      setReady(true); 
-                    }
+                  const newWidth = e.nativeEvent.layout.width;
+                  if (newWidth > 0 && newWidth !== contentWidth) {
+                    setContentWidth(newWidth);
                   }
+                  if (newWidth > 0 && !ready) {
+                    setReady(true);
+                  }
+                }
                 : undefined
             }
           >
@@ -88,7 +92,7 @@ const tickerStyles = StyleSheet.create({
   clip: {
     overflow: 'hidden',
     height: 28,
-    width: '100%', 
+    width: '100%',
     backgroundColor: '#000',
   },
   track: {
@@ -108,140 +112,159 @@ const tickerStyles = StyleSheet.create({
 // -----------------------------------------------------------------
 // --- 2. HabitCard Component ---
 // -----------------------------------------------------------------
-function HabitCard({ iconName, title, subtitle, streak, imageSource, status }) {
-  return (
-    <View style={cardStyles.card}>
-      {/* Card Image and Status Badge */}
-      <ImageBackground 
-        source={imageSource} 
-        style={cardStyles.imageBackground}
-        imageStyle={{ borderRadius: 20 }} // Apply borderRadius directly to image
-      >
-        {/* Overlay for "glass" effect on the image */}
-        <View style={cardStyles.imageOverlay}> 
-          <View style={cardStyles.statusBadge}>
-            <Ionicons name="ellipse" size={8} color="#FCD34D" /> {/* Yellow dot */}
-            <Text style={cardStyles.statusText}>{status}</Text>
-          </View>
-        </View>
-      </ImageBackground>
+function HabitCard({ iconEmoji, title, subtitle, streak, imageSource, status }) {
+  const isSkipped = status === 'Skipped'; // Check if the card is skipped
 
-      {/* Card Content */}
-      <View style={cardStyles.contentContainer}>
-        {/* Main Content: Icon, Title, Subtitle, Streak */}
-        <View style={cardStyles.mainContent}>
-          <View style={cardStyles.mainTextContainer}>
-            {/* --- Boxing Glove Icon --- */}
-            <Ionicons name={iconName} size={24} color="#E5E7EB" style={cardStyles.mainIcon} />
-            <View style={cardStyles.mainText}>
-              <Text style={cardStyles.cardTitle}>{title}</Text>
-              <Text style={cardStyles.cardSubtitle}>{subtitle}</Text>
+  return (
+    <ImageBackground
+      source={imageSource}
+      style={cardStyles.card}
+      imageStyle={{ borderRadius: 20 }} // Apply borderRadius to the background image
+    >
+      {/* Gradient Overlay for text readability */}
+      <LinearGradient
+        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.8)']} // From transparent to dark
+        locations={[0.5, 0.8, 1.0]} // Start fade from halfway, darken towards bottom
+        style={cardStyles.gradientOverlay}
+      >
+        {/* --- Status Badge (Top Left) --- */}
+        <View style={[
+          cardStyles.statusBadge,
+          // Dynamically change style based on status
+          isSkipped ? cardStyles.skippedStatusBadge : cardStyles.inProgressStatusBadge
+        ]}>
+          {isSkipped
+            // Show red 'X' icon if skipped
+            ? <Ionicons name="close-circle-sharp" size={14} color="#FFF" />
+            // Show yellow dot if in progress
+            : <Ionicons name="ellipse" size={8} color="#FCD34D" />
+          }
+          <Text style={cardStyles.statusText}>{status}</Text>
+        </View>
+
+        {/* Main Content & Streak (Bottom section) */}
+        <View style={cardStyles.bottomContentContainer}>
+          <View style={cardStyles.mainContent}>
+            <View style={cardStyles.mainTextContainer}>
+              {/* --- Emoji for Title --- */}
+              <Text style={cardStyles.emojiIcon}>{iconEmoji}</Text>
+              <View style={cardStyles.mainText}>
+                <Text style={cardStyles.cardTitle}>{title}</Text>
+                <Text style={cardStyles.cardSubtitle}>{subtitle}</Text>
+              </View>
+            </View>
+
+            {/* --- Streak Badge (single line) --- */}
+            <View style={cardStyles.streakBadge}>
+              <Text style={cardStyles.streakText}>Streak | {streak}</Text>
             </View>
           </View>
-          
-          {/* --- Streak Badge (single line) --- */}
-          <View style={cardStyles.streakBadge}>
-            <Text style={cardStyles.streakText}>Streak | {streak}</Text>
+
+          {/* Footer: Tap to complete or reset */}
+          <View style={cardStyles.footer}>
+            {/* 2. ICON CHANGE HERE: */}
+            {isSkipped
+              ? <Ionicons name="refresh-circle-outline" size={16} color="#9CA3AF" />
+              // Use MaterialIcons 'touch-app' for the "In Progress" card
+              : <MaterialIcons name="touch-app" size={25} color="#9CA3AF" />
+            }
+            <Text style={cardStyles.footerText}>
+              {isSkipped ? 'Tap to reset' : 'Tap to complete or skip'}
+            </Text>
           </View>
         </View>
-
-        {/* Footer: Tap to complete */}
-        <View style={cardStyles.footer}>
-          {/* --- Tap Icon --- */}
-          <Ionicons name="finger-print-outline" size={16} color="#9CA3AF" />
-          <Text style={cardStyles.footerText}>Tap to complete or skip</Text>
-        </View>
-      </View>
-    </View>
+      </LinearGradient>
+    </ImageBackground>
   );
 }
 
 // --- Card Styles ---
 const cardStyles = StyleSheet.create({
   card: {
-    backgroundColor: '#1F2937', // Dark gray for the whole card background
+    height: 300,
     borderRadius: 20,
     marginHorizontal: 16,
     marginTop: 16,
-    overflow: 'hidden', // Ensures everything inside respects the border radius
-    borderWidth: 1, // Add a subtle border
-    borderColor: '#374151', // Lighter gray border
+    overflow: 'hidden',
+    borderWidth: 1,
+    borderColor: '#FFF',
+    justifyContent: 'space-between',
   },
-  imageBackground: {
-    height: 160, // Increased height for the image area
-    justifyContent: 'flex-start', // Align content to the top
-    alignItems: 'flex-start', // Align content to the left
-  },
-  imageOverlay: {
-    // This view creates the "glass" effect
-    backgroundColor: 'rgba(0,0,0,0.2)', // Semi-transparent black overlay
-    borderRadius: 20, // Match card radius
-    flex: 1, // Fill the image background
-    width: '100%',
-    padding: 12, // Padding for the status badge
-    // borderWidth: 0.5, // Optional: subtle inner border for glass effect
-    // borderColor: 'rgba(255,255,255,0.3)', // Optional: subtle inner border for glass effect
+  gradientOverlay: {
+    flex: 1,
+    borderRadius: 20,
+    justifyContent: 'space-between',
+    padding: 16,
   },
   statusBadge: {
-    backgroundColor: 'rgba(252, 211, 77, 0.2)', // Translucent yellow
     borderRadius: 16,
     paddingVertical: 6,
     paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6, // Space between dot and text
-    alignSelf: 'flex-start', // Important to align to top-left
-    borderWidth: 1, // Subtle border to define the shape
-    borderColor: 'rgba(252, 211, 77, 0.4)', // Slightly darker translucent yellow
+    gap: 6,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+  },
+  // --- New Style for 'In Progress' ---
+  inProgressStatusBadge: {
+    backgroundColor: 'rgba(252, 211, 77, 0.2)',
+    borderColor: 'rgba(252, 211, 77, 0.4)',
+  },
+  // --- New Style for 'Skipped' ---
+  skippedStatusBadge: {
+    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+    borderColor: 'rgba(239, 68, 68, 0.4)',
   },
   statusText: {
-    color: '#FFF', // White text
+    color: '#FFF',
     fontWeight: 'bold',
     fontSize: 12,
   },
-  contentContainer: {
-    padding: 16,
-    backgroundColor: '#1F2937', // Ensure content area is dark
+  bottomContentContainer: {
+    width: '100%',
   },
   mainContent: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center', // Align items center vertically
-    marginBottom: 10, // Space between main content and subtitle
+    alignItems: 'flex-end',
+    marginBottom: 10,
   },
   mainTextContainer: {
     flexDirection: 'row',
-    alignItems: 'center', // Center icon and text
+    alignItems: 'center',
     flex: 1,
     marginRight: 12,
   },
-  mainIcon: {
-    marginRight: 10, // Space between icon and title
+  // --- New Style for Emoji ---
+  emojiIcon: {
+    fontSize: 24, // Size for the emoji
+    marginRight: 10,
   },
   mainText: {
     flex: 1,
   },
   cardTitle: {
     color: '#FFF',
-    fontSize: 18,
+    fontSize: 22,
     fontWeight: 'bold',
   },
   cardSubtitle: {
-    color: '#9CA3AF',
+    color: '#E5E7EB',
     fontSize: 14,
-    marginTop: 4, // More space after title
-    lineHeight: 20, // Adjust line height for readability
+    marginTop: 4,
+    lineHeight: 20,
   },
   streakBadge: {
-    backgroundColor: 'rgba(55, 65, 81, 0.6)', // Translucent dark gray
+    backgroundColor: 'rgba(255, 255, 255, 0.11)',
     borderRadius: 16,
     paddingVertical: 8,
     paddingHorizontal: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 90, // Ensure it's wide enough for "Streak | 3 days"
-    borderWidth: 1, // Subtle border
-    borderColor: 'rgba(55, 65, 81, 0.8)', // Slightly darker translucent gray
+    borderWidth: 1,
+    borderColor: 'rgba(80, 80, 80, 0.8)',
+    alignSelf: 'flex-end',
   },
   streakText: {
     color: '#FFF',
@@ -249,7 +272,7 @@ const cardStyles = StyleSheet.create({
     fontWeight: 'bold',
   },
   footer: {
-    borderTopColor: '#374151',
+    borderTopColor: 'rgba(55, 65, 81, 0.5)',
     borderTopWidth: 1,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -270,7 +293,7 @@ const cardStyles = StyleSheet.create({
 // -----------------------------------------------------------------
 function TabButton({ label, isActive, onPress }) {
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
       style={[tabStyles.tab, isActive ? tabStyles.activeTab : null]}
       onPress={onPress}
     >
@@ -344,7 +367,7 @@ const DATES = [
 const TODOS = [
   {
     id: '1',
-    iconName: 'fitness-outline', // Updated icon to a more general fitness one
+    iconEmoji: '🥊',
     title: 'Boxing',
     subtitle: 'Start strong, breathe deep, and hit the day with determination!',
     streak: '3 days',
@@ -353,7 +376,7 @@ const TODOS = [
   },
   {
     id: '2',
-    iconName: 'briefcase-outline',
+    iconName: '📈',
     title: 'Work',
     subtitle: 'make today count.',
     streak: '3 days',
@@ -362,7 +385,7 @@ const TODOS = [
   },
   {
     id: '3',
-    iconName: 'walk-outline',
+    iconName: '🌳',
     title: 'Run',
     subtitle: '10km morning run',
     streak: '1 day',
@@ -382,12 +405,12 @@ function HomeScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-      
+
       {/* 1. Ticker */}
       <HeaderQuoteScroll />
-      
+
       <ScrollView style={styles.scrollView}>
-        
+
         {/* Date and Create Button */}
         <View style={styles.header}>
           <Text style={styles.dateText}>THURSDAY, 09 OCT</Text>
@@ -403,8 +426,8 @@ function HomeScreen() {
             {DATES.map((date) => {
               const isActive = date.num === selectedDate;
               return (
-                <TouchableOpacity 
-                  key={date.id} 
+                <TouchableOpacity
+                  key={date.id}
                   style={[styles.dateCircle, isActive ? styles.activeDateCircle : null]}
                   onPress={() => setSelectedDate(date.num)}
                 >
@@ -419,17 +442,17 @@ function HomeScreen() {
 
         {/* Tabs (To-dos, Done, Skipped) */}
         <View style={styles.tabsContainer}>
-          <TabButton 
+          <TabButton
             label="To-dos (4)"
             isActive={selectedTab === 'To-dos'}
             onPress={() => setSelectedTab('To-dos')}
           />
-          <TabButton 
+          <TabButton
             label="Done (0)"
             isActive={selectedTab === 'Done'}
             onPress={() => setSelectedTab('Done')}
           />
-          <TabButton 
+          <TabButton
             label="Skipped (1)"
             isActive={selectedTab === 'Skipped'}
             onPress={() => setSelectedTab('Skipped')}
@@ -438,7 +461,7 @@ function HomeScreen() {
 
         {/* --- To-Do Cards --- */}
         {TODOS.map((todo) => (
-          <HabitCard 
+          <HabitCard
             key={todo.id}
             iconName={todo.iconName}
             title={todo.title}
@@ -456,7 +479,7 @@ function HomeScreen() {
 
       {/* 3. Bottom Tab Bar */}
       <BottomNavBar />
-      
+
     </SafeAreaView>
   );
 }
