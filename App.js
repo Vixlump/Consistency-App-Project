@@ -5,7 +5,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
-import { Text } from 'react-native'; 
+import { Text } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
 
 
@@ -20,6 +20,11 @@ import SettingsScreen from './src/screens/SettingsScreen';
 import AddHabitScreen from './src/screens/AddHabitScreen';
 import LocationPickerScreen from './src/screens/LocationPickerScreen';
 import HomeScreen from './src/screens/HomeScreen';
+import MapScreen from './src/screens/MapScreen';
+import MapCameraScreen from './src/screens/MapCameraScreen';
+import MapLogEditScreen from './src/screens/MapLogEditScreen';
+import MapUploadConfirmScreen from './src/screens/MapUploadConfirmScreen';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -73,6 +78,7 @@ export default function App() {
     <View style={styles.container}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
+        {/* <Stack.Navigator initialRouteName="Map"> */}
           <Stack.Screen
             name="Login"
             component={LoginScreen}
@@ -98,6 +104,29 @@ export default function App() {
             component={LocationPickerScreen}
             options={{ title: 'Select Location' }}
           />
+
+          
+          <Stack.Screen
+            name="Map"
+            component={MapScreen}
+            options={{ headerShown: false }}
+          />
+          <Stack.Screen
+            name="MapCamera"
+            component={MapCameraScreen}
+            options={{ headerShown: false, presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="MapLogEdit"
+            component={MapLogEditScreen}
+            options={{ headerShown: false, presentation: 'modal' }}
+          />
+          <Stack.Screen
+            name="MapUploadConfirm"
+            component={MapUploadConfirmScreen}
+            options={{ headerShown: false, presentation: 'containedModal' }}
+          />
+
         </Stack.Navigator>
       </NavigationContainer>
       <StatusBar style="auto" />
