@@ -7,9 +7,9 @@ import mapStyle from '../../assets/mapStyles/dark.json'; // dark map theme
 
 // demo images for markers (replace with your own)
 const IMAGES = {
-  boxing: require('../../assets/images/boxing.jpg'),
-  run: require('../../assets/images/run.jpg'),
-  work: require('../../assets/images/work.jpg'),
+  boxing: require('../../assets/images/boxing.png'),
+  run: require('../../assets/images/run.png'),
+  work: require('../../assets/images/work.png'),
 };
 
 export default function LogsMapScreen() {
