@@ -1,3 +1,36 @@
+// {
+//   "expo": {
+//     "name": "-consistency-app-project",
+//     "slug": "snack-d11abb2b-1102-46e1-bc7b-28d5fc3aaa66",
+//     "version": "1.0.0",
+//     "orientation": "portrait",
+//     "icon": "./assets/icon.png",
+//     "userInterfaceStyle": "light",
+//     "newArchEnabled": true,
+//     "splash": {
+//       "image": "./assets/splash-icon.png",
+//       "resizeMode": "contain",
+//       "backgroundColor": "#ffffff"
+//     },
+//     "ios": {
+//       "supportsTablet": true
+//     },
+//     "android": {
+//       "adaptiveIcon": {
+//         "foregroundImage": "./assets/adaptive-icon.png",
+//         "backgroundColor": "#ffffff"
+//       },
+//       "edgeToEdgeEnabled": true
+//     },
+//     "web": {
+//       "favicon": "./assets/favicon.png"
+//     },
+//     "plugins": [
+//       "expo-font"
+//     ]
+//   }
+// }
+
 {
   "expo": {
     "name": "-consistency-app-project",
@@ -13,20 +46,42 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "We use your location to log where your habits are completed on the map."
+      },
+      "config": {
+        "googleMapsApiKey": "AIzaSyAlPLq9GPh0PgkJvgcnXAwEeIl4w0TMzLA"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true
-    },
-    "web": {
-      "favicon": "./assets/favicon.png"
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION"
+      ],
+      "edgeToEdgeEnabled": true,
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyAlPLq9GPh0PgkJvgcnXAwEeIl4w0TMzLA"
+        }
+      }
     },
     "plugins": [
-      "expo-font"
-    ]
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "isAndroidBackgroundLocationEnabled": false,
+          "locationAlwaysAndWhenInUsePermission": "Allow Consistency App to access your location while using the app."
+        }
+      ]
+    ],
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
   }
 }
