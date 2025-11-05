@@ -1,24 +1,69 @@
 import { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../utils/firebase';
 
 export default function SignUpScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignUp = () => {
-    // Mock sign up
-    console.log('Sign up attempt:', { email, password });
-    navigation.navigate('Main');
+  const handleSignUp = async () => {
+    if (!email || !password || !confirmPassword) {
+      Alert.alert('Error', 'Please fill in all fields');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert('Error', 'Passwords do not match');
+      return;
+    }
+
+    if (password.length < 6) {
+      Alert.alert('Error', 'Password should be at least 6 characters');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      console.log('User created:', userCredential.user);
+      navigation.navigate('Main');
+    } catch (error) {
+      console.error('Sign up error:', error);
+      let errorMessage = 'Failed to create account. Please try again.';
+      
+      switch (error.code) {
+        case 'auth/email-already-in-use':
+          errorMessage = 'An account with this email already exists.';
+          break;
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email address.';
+          break;
+        case 'auth/operation-not-allowed':
+          errorMessage = 'Email/password accounts are not enabled.';
+          break;
+        case 'auth/weak-password':
+          errorMessage = 'Password is too weak.';
+          break;
+      }
+      
+      Alert.alert('Sign Up Failed', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -40,6 +85,7 @@ export default function SignUpScreen({ navigation }) {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoComplete="email"
           />
           <TextInput
             style={styles.input}
@@ -47,6 +93,7 @@ export default function SignUpScreen({ navigation }) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            autoComplete="password-new"
           />
           <TextInput
             style={styles.input}
@@ -54,15 +101,25 @@ export default function SignUpScreen({ navigation }) {
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
+            autoComplete="password-new"
           />
 
-          <TouchableOpacity style={styles.signUpButton} onPress={handleSignUp}>
-            <Text style={styles.signUpButtonText}>Create Account</Text>
+          <TouchableOpacity 
+            style={[styles.signUpButton, loading && styles.signUpButtonDisabled]} 
+            onPress={handleSignUp}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.signUpButtonText}>Create Account</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.loginLink}
             onPress={() => navigation.navigate('Login')}
+            disabled={loading}
           >
             <Text style={styles.loginText}>
               Already have an account? <Text style={styles.loginBold}>Login</Text>
@@ -134,5 +191,8 @@ const styles = StyleSheet.create({
   loginBold: {
     color: '#6366f1',
     fontWeight: '600',
+  },
+  signUpButtonDisabled: {
+    opacity: 0.6,
   },
 });

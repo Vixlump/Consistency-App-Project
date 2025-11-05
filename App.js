@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
+import { ActivityIndicator } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,6 +8,8 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View } from 'react-native';
 import { Text } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from './src/utils/firebase';
 
 
 
@@ -24,7 +27,6 @@ import MapScreen from './src/screens/MapScreen';
 import MapCameraScreen from './src/screens/MapCameraScreen';
 import MapLogEditScreen from './src/screens/MapLogEditScreen';
 import MapUploadConfirmScreen from './src/screens/MapUploadConfirmScreen';
-
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -74,6 +76,26 @@ function MainTabs() {
 }
 
 export default function App() {
+
+  const [initializing, setInitializing] = useState(true);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const subscriber = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+      if (initializing) setInitializing(false);
+    });
+    return subscriber; // unsubscribe on unmount
+  }, [initializing]);
+
+  if (initializing) {
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color="#6366f1" />
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <NavigationContainer>
@@ -137,6 +159,12 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#fff',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: '#fff',
   },
 });

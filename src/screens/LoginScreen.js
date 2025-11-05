@@ -1,23 +1,61 @@
 import { useState } from 'react';
 import {
-    KeyboardAvoidingView,
-    Platform,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../utils/firebase';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleLogin = () => {
-    // Mock authentication - in real app, this would connect to Supabase/Firebase
-    console.log('Login attempt:', { email, password });
-    navigation.navigate('Main');
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Please enter both email and password');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      console.log('User logged in:', userCredential.user);
+      navigation.navigate('Main');
+    } catch (error) {
+      console.error('Login error:', error);
+      let errorMessage = 'Failed to login. Please try again.';
+      
+      switch (error.code) {
+        case 'auth/invalid-email':
+          errorMessage = 'Invalid email address.';
+          break;
+        case 'auth/user-disabled':
+          errorMessage = 'This account has been disabled.';
+          break;
+        case 'auth/user-not-found':
+          errorMessage = 'No account found with this email.';
+          break;
+        case 'auth/wrong-password':
+          errorMessage = 'Incorrect password.';
+          break;
+        case 'auth/too-many-requests':
+          errorMessage = 'Too many failed attempts. Please try again later.';
+          break;
+      }
+      
+      Alert.alert('Login Failed', errorMessage);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -39,6 +77,7 @@ export default function LoginScreen({ navigation }) {
             onChangeText={setEmail}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoComplete="email"
           />
           <TextInput
             style={styles.input}
@@ -46,15 +85,25 @@ export default function LoginScreen({ navigation }) {
             value={password}
             onChangeText={setPassword}
             secureTextEntry
+            autoComplete="password"
           />
 
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
-            <Text style={styles.loginButtonText}>Login</Text>
+          <TouchableOpacity 
+            style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.loginButtonText}>Login</Text>
+            )}
           </TouchableOpacity>
 
           <TouchableOpacity 
             style={styles.signUpLink}
             onPress={() => navigation.navigate('SignUp')}
+            disabled={loading}
           >
             <Text style={styles.signUpText}>
               Don't have an account? <Text style={styles.signUpBold}>Sign Up</Text>
@@ -126,5 +175,8 @@ const styles = StyleSheet.create({
   signUpBold: {
     color: '#6366f1',
     fontWeight: '600',
+  },
+  loginButtonDisabled: {
+    opacity: 0.6,
   },
 });
