@@ -25,11 +25,19 @@ export default function MapLogEditScreen({ route, navigation }) {
 
   const onSave = () => {
     // TODO: save log, then navigate to confirm
-    navigation.navigate('MapLogConfirm', {
+    navigation.navigate('MapUploadConfirm', {
       photoUri,
       title,
       notes,
       locationText,
+      coords,
+    });
+
+    navigation.navigate('MapUploadConfirm', {
+      photoUri,
+      title,
+      note: notes,           // rename to `note`
+      address: locationText, // rename to `address`
       coords,
     });
   };

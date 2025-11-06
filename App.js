@@ -25,8 +25,10 @@ import LocationPickerScreen from './src/screens/LocationPickerScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import MapScreen from './src/screens/MapScreen';
 import MapCameraScreen from './src/screens/MapCameraScreen';
-import MapLogEditScreen from './src/screens/MapLogEditScreen';
 import MapUploadConfirmScreen from './src/screens/MapUploadConfirmScreen';
+import MapLogEditScreen from './src/screens/MapLogEditScreen';
+// import MapLogDetailScreen from './src/screens/MapLogDetailScreen';
+
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -154,6 +156,11 @@ export default function App() {
             name="MapUploadConfirm"
             component={MapUploadConfirmScreen}
             options={{ headerShown: false, presentation: 'containedModal' }}
+          />
+          <Stack.Screen
+            name="MapLogDetail"
+            component={MapLogEditScreen}
+            options={{ headerShown: false }}   // or true if you want a header
           />
 
         </Stack.Navigator>
