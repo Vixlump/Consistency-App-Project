@@ -1,65 +1,166 @@
-import { useEffect, useState } from 'react';
-import { ImageBackground, View, Text, TextInput, Pressable, StyleSheet } from 'react-native';
-import * as Location from 'expo-location';
+// src/screens/MapLogEditScreen.js
+import React, { useState } from 'react';
+import {
+  View,
+  StyleSheet,
+  ImageBackground,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  KeyboardAvoidingView,
+  TouchableWithoutFeedback,
+  Keyboard,
+  Platform,
+  SafeAreaView,
+} from 'react-native';
+import { BlurView } from 'expo-blur';
+import { Ionicons } from '@expo/vector-icons';
+
 
 export default function MapLogEditScreen({ route, navigation }) {
-  const { photoUri, coords } = route.params;
+  const { photoUri, coords } = route.params || {};
   const [title, setTitle] = useState('');
-  const [note, setNote] = useState('');
-  const [address, setAddress] = useState('Locating...');
+  const [notes, setNotes] = useState('');
+  const [locationText, setLocationText] = useState('');
 
-  useEffect(() => {
-    (async () => {
-      if (!coords) return;
-      const r = await Location.reverseGeocodeAsync({ latitude: coords.lat, longitude: coords.lng });
-      const first = r[0];
-      if (first) {
-        const line = [first.name, first.city, first.region, first.postalCode, first.country].filter(Boolean).join(', ');
-        setAddress(line);
-      } else setAddress('Unknown place');
-    })();
-  }, []);
+  const onSave = () => {
+    // TODO: save log, then navigate to confirm
+    navigation.navigate('MapLogConfirm', {
+      photoUri,
+      title,
+      notes,
+      locationText,
+      coords,
+    });
+  };
 
   return (
-    <ImageBackground source={{ uri: photoUri }} style={{ flex:1 }}>
-      <Pressable style={s.close} onPress={() => navigation.goBack()}><Text style={s.closeTxt}>✕</Text></Pressable>
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <View style={styles.root}>
+        <ImageBackground source={{ uri: photoUri }} style={styles.photo} />
 
-      <View style={s.sheet}>
-        <Text style={s.label}>TITLE</Text>
-        <TextInput style={s.input} placeholder="Add your title" value={title} onChangeText={setTitle} />
-
-        <Text style={s.label}>NOTES</Text>
-        <TextInput
-          style={[s.input, { height: 90 }]}
-          placeholder="Write note here..."
-          multiline
-          value={note}
-          onChangeText={setNote}
-        />
-
-        <Text style={s.label}>LOCATION</Text>
-        <View style={s.addr}><Text style={{ color:'#e7e7ea' }}>{address}</Text></View>
-
-        <Pressable
-          onPress={() => navigation.replace('MapUploadConfirm', { photoUri, title, note, address, coords })}
-          style={s.save}
+        {/* Close button */}
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={() => navigation.goBack()}   // or navigation.navigate('LogsMap')
         >
-          <Text style={{ fontWeight:'700' }}>Save</Text>
-        </Pressable>
+          <Ionicons name="close" size={40} color="#fff" />
+        </TouchableOpacity>
+
+        {/* dark/blur overlay under the card */}
+        <BlurView intensity={40} tint="dark" style={StyleSheet.absoluteFillObject} />
+        <View style={[StyleSheet.absoluteFill, { backgroundColor: 'rgba(0,0,0,0.35)' }]} />
+
+        <SafeAreaView style={StyleSheet.absoluteFill}>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={Platform.OS === 'ios' ? 24 : 0}
+            style={styles.kav}
+          >
+            {/* Centered floating card */}
+            <View style={styles.centerWrap} pointerEvents="box-none">
+              <View style={styles.card}>
+                <Text style={styles.label}>TITLE</Text>
+                <TextInput
+                  placeholder="Add your title"
+                  placeholderTextColor="#9CA3AF"
+                  value={title}
+                  onChangeText={setTitle}
+                  style={styles.input}
+                  returnKeyType="next"
+                />
+
+                <Text style={[styles.label, { marginTop: 12 }]}>NOTES</Text>
+                <TextInput
+                  placeholder="Write note here..."
+                  placeholderTextColor="#9CA3AF"
+                  value={notes}
+                  onChangeText={setNotes}
+                  style={[styles.input, styles.multiline]}
+                  multiline
+                />
+
+                <Text style={[styles.label, { marginTop: 12 }]}>LOCATION</Text>
+                <TextInput
+                  placeholder="Search / edit location"
+                  placeholderTextColor="#9CA3AF"
+                  value={locationText}
+                  onChangeText={setLocationText}
+                  style={styles.input}
+                />
+
+                <TouchableOpacity style={styles.saveBtn} onPress={onSave}>
+                  <Text style={styles.saveTxt}>Save</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </KeyboardAvoidingView>
+        </SafeAreaView>
       </View>
-    </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 }
 
-const s = StyleSheet.create({
-  close:{ position:'absolute', top:40, right:20, zIndex:2 },
-  closeTxt:{ color:'#fff', fontSize:28, fontWeight:'800' },
-  sheet:{
-    position:'absolute', left:16, right:16, bottom:24,
-    backgroundColor:'rgba(20,20,22,0.85)', padding:16, borderRadius:14
+const CARD_MAX_WIDTH = 420;
+
+const styles = StyleSheet.create({
+  root: { flex: 1, backgroundColor: '#000' },
+  photo: { flex: 1 },
+  kav: { flex: 1 },
+  centerWrap: {
+    flex: 1,
+    justifyContent: 'center',     // centers vertically
+    alignItems: 'center',          // centers horizontally
+    paddingHorizontal: 20,
   },
-  label:{ color:'#9aa0a6', fontSize:12, marginTop:4 },
-  input:{ backgroundColor:'#1a1b1f', color:'#fff', borderRadius:10, paddingHorizontal:12, paddingVertical:10, marginTop:6 },
-  addr:{ backgroundColor:'#1a1b1f', borderRadius:10, padding:12, marginTop:6 },
-  save:{ backgroundColor:'#fff', alignItems:'center', paddingVertical:12, borderRadius:12, marginTop:16 }
+  card: {
+    width: '100%',
+    maxWidth: CARD_MAX_WIDTH,
+    backgroundColor: 'rgba(17,17,17,0.9)',
+    borderRadius: 20,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    shadowColor: '#000',
+    shadowOpacity: 0.35,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 8 },
+  },
+  label: {
+    color: '#9CA3AF',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  input: {
+    color: '#E5E7EB',
+    backgroundColor: 'rgba(255,255,255,0.06)',
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.08)',
+    marginTop: 6,
+  },
+  multiline: {
+    minHeight: 90,
+    textAlignVertical: 'top',
+  },
+
+  closeBtn: {
+    position: 'absolute',
+    top: 60, // adjust depending on your notch
+    right: 24,
+    zIndex: 20,
+    padding: 8,
+  },
+
+  saveBtn: {
+    marginTop: 16,
+    backgroundColor: '#fff',
+    borderRadius: 14,
+    alignItems: 'center',
+    paddingVertical: 14,
+  },
+  saveTxt: { color: '#0B0B0B', fontWeight: '800', fontSize: 16 },
 });

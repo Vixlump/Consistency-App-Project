@@ -1,9 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Alert, Image } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { View, Text, StyleSheet, Pressable, ActivityIndicator, Alert, Image } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import * as Location from 'expo-location';
+import { Ionicons } from '@expo/vector-icons';
+import { useFocusEffect } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native';
+
+
 import { addLog, getLogs } from '../utils/logs';
-import mapStyle from '../../assets/mapStyles/dark.json'; // dark map theme
+import mapStyle from '../../assets/mapStyles/dark.json';
 
 // demo images for markers (replace with your own)
 const IMAGES = {
@@ -13,11 +18,12 @@ const IMAGES = {
 };
 
 export default function LogsMapScreen() {
+  const navigation = useNavigation();
   const [region, setRegion] = useState(null);
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // ask for permission and load location + logs
+  // ask for permission and get initial region
   useEffect(() => {
     (async () => {
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -26,7 +32,6 @@ export default function LogsMapScreen() {
         setLoading(false);
         return;
       }
-
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const { latitude, longitude } = pos.coords;
 
@@ -36,14 +41,18 @@ export default function LogsMapScreen() {
         latitudeDelta: 0.02,
         longitudeDelta: 0.02,
       });
-
-      const existing = await getLogs();
-      setLogs(existing);
       setLoading(false);
     })();
   }, []);
 
-  // add a new log marker at current location
+  // refresh markers whenever we return to this screen
+  useFocusEffect(
+    useCallback(() => {
+      (async () => setLogs(await getLogs()))();
+    }, [])
+  );
+
+  // (optional) quick-add at current spot – keep if you still want it anywhere
   const handleAddHere = useCallback(async () => {
     try {
       const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
@@ -64,6 +73,12 @@ export default function LogsMapScreen() {
     }
   }, []);
 
+  // open camera flow
+  const openCamera = () => {
+    if (!region) return;
+    navigation.navigate('MapCamera', { coords: { lat: region.latitude, lng: region.longitude } });
+  };
+
   if (loading || !region) {
     return (
       <View style={styles.center}>
@@ -77,36 +92,44 @@ export default function LogsMapScreen() {
     <View style={styles.container}>
       <MapView
         style={StyleSheet.absoluteFill}
-        provider={PROVIDER_GOOGLE} // ensure Google Maps
-        customMapStyle={mapStyle} // dark theme
+        provider={PROVIDER_GOOGLE}
+        customMapStyle={mapStyle}
         initialRegion={region}
+        showsUserLocation
+        showsMyLocationButton={false}
       >
-        {/* show current location */}
-        <Marker
-          coordinate={{ latitude: region.latitude, longitude: region.longitude }}
-          title="You are here"
-        />
-
-        {/* show habit logs */}
+        {/* existing logs */}
         {logs.map((l) => (
           <Marker
             key={l.id}
             coordinate={{ latitude: l.lat, longitude: l.lng }}
-            title={l.title}
-            description={new Date(l.timestamp).toLocaleString()}
+            onPress={() => navigation.navigate('MapLogDetail', { log: l })}
           >
-            <Image
-              source={IMAGES[l.habitId] || IMAGES.boxing}
-              style={styles.markerImage}
-            />
+            <View style={styles.pinWrap}>
+              <Image source={IMAGES[l.habitId] || IMAGES.boxing} style={styles.pinImg} />
+            </View>
+
+            {/* optional native callout too */}
+            <Callout tooltip onPress={() => navigation.navigate('MapLogDetail', { log: l })}>
+              <View style={styles.callout}>
+                <Text style={styles.calloutTitle}>{l.title || 'Log'}</Text>
+                <Text style={styles.calloutSub}>{new Date(l.timestamp).toLocaleString()}</Text>
+                <Text style={styles.calloutLink}>View details →</Text>
+              </View>
+            </Callout>
           </Marker>
         ))}
       </MapView>
 
-      {/* Floating add button */}
-      <TouchableOpacity style={styles.fab} onPress={handleAddHere}>
-        <Text style={styles.fabText}>+ Log Here</Text>
-      </TouchableOpacity>
+      {/* Floating camera action */}
+      <Pressable onPress={openCamera} style={styles.camBtn}>
+        <Ionicons name="camera" size={28} color="#fff" />
+      </Pressable>
+
+      {/* If you still want the quick “+ Log Here” creator, keep this secondary btn */}
+      {/* <Pressable onPress={handleAddHere} style={[styles.camBtn, { right: 24, left: undefined }]}>
+        <Ionicons name="add" size={28} color="#fff" />
+      </Pressable> */}
     </View>
   );
 }
@@ -115,32 +138,32 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#0B0B0B' },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
-  markerImage: {
-    width: 64,
-    height: 64,
-    borderRadius: 12,
-    borderWidth: 3,
-    borderColor: '#fff',
-    shadowColor: '#000',
-    shadowOpacity: 0.35,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 2 },
+  pinWrap: {
+    width: 56, height: 56, borderRadius: 14,
+    overflow: 'hidden', borderWidth: 3, borderColor: '#fff',
   },
+  pinImg: { width: '100%', height: '100%' },
 
-  fab: {
+  camBtn: {
     position: 'absolute',
     bottom: 24,
     alignSelf: 'center',
     backgroundColor: '#111827',
     borderColor: '#374151',
     borderWidth: 1,
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    borderRadius: 28,
+    padding: 14,
+    elevation: 5,
   },
-  fabText: {
-    color: '#E5E7EB',
-    fontWeight: '700',
-    fontSize: 16,
+
+  callout: {
+    backgroundColor: 'white',
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    minWidth: 180,
   },
+  calloutTitle: { fontWeight: '800', marginBottom: 4 },
+  calloutSub: { color: '#6b7280', marginBottom: 6, fontSize: 12 },
+  calloutLink: { color: '#111827', fontWeight: '700' },
 });

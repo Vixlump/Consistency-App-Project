@@ -100,7 +100,7 @@ export default function App() {
     <View style={styles.container}>
       <NavigationContainer>
         <Stack.Navigator initialRouteName="Login">
-        {/* <Stack.Navigator initialRouteName="Map"> */}
+          {/* <Stack.Navigator initialRouteName="Map"> */}
           <Stack.Screen
             name="Login"
             component={LoginScreen}
@@ -127,7 +127,7 @@ export default function App() {
             options={{ title: 'Select Location' }}
           />
 
-          
+
           <Stack.Screen
             name="Map"
             component={MapScreen}
@@ -136,13 +136,20 @@ export default function App() {
           <Stack.Screen
             name="MapCamera"
             component={MapCameraScreen}
-            options={{ headerShown: false, presentation: 'modal' }}
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',   // <- not a sheet
+              contentStyle: { backgroundColor: 'black' }, // prevent any peek-through
+            }}
           />
           <Stack.Screen
             name="MapLogEdit"
             component={MapLogEditScreen}
-            options={{ headerShown: false, presentation: 'modal' }}
-          />
+            options={{
+              headerShown: false,
+              presentation: 'fullScreenModal',   // <- not a sheet
+              contentStyle: { backgroundColor: 'black' }, // prevent any peek-through
+            }} />
           <Stack.Screen
             name="MapUploadConfirm"
             component={MapUploadConfirmScreen}

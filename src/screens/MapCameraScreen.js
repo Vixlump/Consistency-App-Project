@@ -1,32 +1,69 @@
-import { View, Pressable, Text, StyleSheet } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
+// src/screens/MapCameraScreen.js
+import React, { useRef, useEffect } from 'react';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function MapCameraScreen({ route, navigation }) {
-  const { coords } = route.params;
+export default function MapCameraScreen({ navigation, route }) {
+  const cameraRef = useRef(null);
+  const [permission, requestPermission] = useCameraPermissions();
 
-  const openCamera = async () => {
-    const { status } = await ImagePicker.requestCameraPermissionsAsync();
-    if (status !== 'granted') return;
-    const res = await ImagePicker.launchCameraAsync({ quality: 0.9, exif: false });
-    if (!res.canceled) {
-      const uri = res.assets[0].uri;
-      navigation.replace('MapLogEdit', { photoUri: uri, coords });
+  useEffect(() => {
+    if (!permission || !permission.granted) {
+      requestPermission();
     }
+  }, [permission]);
+
+  if (!permission) return <View style={styles.container} />;
+  if (!permission.granted) {
+    return (
+      <View style={styles.center}>
+        <Text style={{ color: '#fff' }}>Camera permission is required.</Text>
+        <TouchableOpacity onPress={requestPermission} style={styles.permBtn}>
+          <Text style={{ fontWeight: '700' }}>Grant permission</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  const takePhoto = async () => {
+    if (!cameraRef.current) return;
+    const photo = await cameraRef.current.takePictureAsync();
+    navigation.navigate('MapLogEdit', {
+      photoUri: photo?.uri,
+      coords: route.params?.coords,
+    });
   };
 
   return (
-    <View style={s.wrap}>
-      <Pressable style={s.shutter} onPress={openCamera}>
-        <Text style={{ color:'#fff', fontSize:16 }}>Open Camera</Text>
-      </Pressable>
-      <Pressable style={s.close} onPress={() => navigation.goBack()}>
-        <Text style={{ color:'#fff', fontSize:18 }}>✕</Text>
-      </Pressable>
+    <View style={styles.container}>
+      <CameraView ref={cameraRef} style={styles.camera} facing="back">
+        <TouchableOpacity style={styles.closeBtn} onPress={() => navigation.goBack()}>
+          <Ionicons name="close" size={40} color="#fff" />
+        </TouchableOpacity>
+
+        <View style={styles.bottomRow}>
+          <TouchableOpacity onPress={takePhoto} style={styles.captureBtn}>
+            <Ionicons name="camera" size={34} color="#000" />
+          </TouchableOpacity>
+        </View>
+      </CameraView>
     </View>
   );
 }
-const s = StyleSheet.create({
-  wrap:{ flex:1, backgroundColor:'#000', alignItems:'center', justifyContent:'center' },
-  shutter:{ borderWidth:3, borderColor:'#fff', width:88, height:88, borderRadius:44, alignItems:'center', justifyContent:'center' },
-  close:{ position:'absolute', top:40, right:20 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#000' },
+  center: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  permBtn: { marginTop: 12, backgroundColor: '#fff', paddingVertical: 10, paddingHorizontal: 16, borderRadius: 10 },
+  camera: {
+    flex: 1,
+    justifyContent: 'flex-end', // pushes items to bottom
+    alignItems: 'center',        // centers horizontally
+  },
+  closeBtn: { position: 'absolute', top: 60, right: 30, zIndex: 2 },
+  bottomRow: {
+    marginBottom: 60,
+  },
+  captureBtn: { backgroundColor: '#fff', width: 80, height: 80, borderRadius: 40, justifyContent: 'center', alignItems: 'center' },
 });
