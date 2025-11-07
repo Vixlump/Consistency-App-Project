@@ -27,7 +27,7 @@ import MapScreen from './src/screens/MapScreen';
 import MapCameraScreen from './src/screens/MapCameraScreen';
 import MapUploadConfirmScreen from './src/screens/MapUploadConfirmScreen';
 import MapLogEditScreen from './src/screens/MapLogEditScreen';
-// import MapLogDetailScreen from './src/screens/MapLogDetailScreen';
+import MapLogDetailScreen from './src/screens/MapLogDetailScreen.js';
 
 
 const Stack = createNativeStackNavigator();
@@ -135,6 +135,12 @@ export default function App() {
             component={MapScreen}
             options={{ headerShown: false }}
           />
+
+          {/* <Stack.Screen
+            name="LogsMap"
+            component={LogsMapScreen}
+            options={{ headerShown: false }}
+          /> */}
           <Stack.Screen
             name="MapCamera"
             component={MapCameraScreen}
@@ -159,8 +165,8 @@ export default function App() {
           />
           <Stack.Screen
             name="MapLogDetail"
-            component={MapLogEditScreen}
-            options={{ headerShown: false }}   // or true if you want a header
+            component={MapLogDetailScreen}
+            options={{ headerShown: false, presentation: 'containedModal' }}
           />
 
         </Stack.Navigator>

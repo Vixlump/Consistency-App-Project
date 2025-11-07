@@ -15,6 +15,8 @@ const IMAGES = {
   boxing: require('../../assets/images/boxing.png'),
   run: require('../../assets/images/run.png'),
   work: require('../../assets/images/work.png'),
+  japan: require('../../assets/images/japan_icon.png'),
+
 };
 
 export default function LogsMapScreen() {
@@ -59,8 +61,9 @@ export default function LogsMapScreen() {
       const { latitude, longitude } = pos.coords;
 
       const newLog = await addLog({
-        habitId: 'boxing',
-        title: 'Boxing',
+        habitId: 'japan',
+        // title: 'Sauna',
+        title: title,
         status: 'done',
         lat: latitude,
         lng: longitude,
@@ -106,7 +109,7 @@ export default function LogsMapScreen() {
             onPress={() => navigation.navigate('MapLogDetail', { log: l })}
           >
             <View style={styles.pinWrap}>
-              <Image source={IMAGES[l.habitId] || IMAGES.boxing} style={styles.pinImg} />
+              <Image source={IMAGES[l.habitId] || IMAGES.japan} style={styles.pinImg} />
             </View>
 
             {/* optional native callout too */}

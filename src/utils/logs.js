@@ -14,6 +14,7 @@ export async function addLog({
   status,
   lat,
   lng,
+  note, address, photoUri,
   timestamp = Date.now(),
 }) {
   try {
@@ -25,13 +26,15 @@ export async function addLog({
       status,
       lat,
       lng,
+      note, 
+      address, 
+      photoUri,
       timestamp,
     };
-    const next = [newLog, ...logs];
-    await AsyncStorage.setItem(KEY, JSON.stringify(next));
+    await AsyncStorage.setItem(KEY, JSON.stringify([newLog, ...logs]));
     return newLog;
-  } catch (error) {
-    console.error('Error saving log:', error);
+  } catch (e) {
+    console.error('Error saving log:', e);
     return null;
   }
 }
@@ -50,13 +53,33 @@ export async function getLogs() {
   }
 }
 
-/**
- * Remove all logs (for testing/reset).
- */
-export async function clearLogs() {
+// add near the other exports
+export async function updateLog(id, patch) {
   try {
-    await AsyncStorage.removeItem(KEY);
-  } catch (error) {
-    console.error('Error clearing logs:', error);
+    const logs = await getLogs();
+    const i = logs.findIndex(l => l.id === id);
+    if (i === -1) return null;
+
+    const updated = { ...logs[i], ...patch };
+    logs[i] = updated;
+
+    await AsyncStorage.setItem(KEY, JSON.stringify(logs));
+    return updated;
+  } catch (e) {
+    console.error('Error updating log:', e);
+    return null;
+  }
+}
+
+
+export async function deleteLog(id) {
+  try {
+    const logs = await getLogs();
+    const next = logs.filter(l => l.id !== id);
+    await AsyncStorage.setItem(KEY, JSON.stringify(next));
+    return true;
+  } catch (e) {
+    console.error('Error deleting log:', e);
+    return false;
   }
 }

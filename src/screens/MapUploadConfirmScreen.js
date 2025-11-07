@@ -1,16 +1,37 @@
 import { useState } from 'react';
 import { ImageBackground, View, Text, Pressable, StyleSheet } from 'react-native';
 import { BlurView } from 'expo-blur';
+import { addLog } from '../utils/logs';
+
 
 export default function MapUploadConfirmScreen({ route, navigation }) {
-  const { photoUri, title, note, address } = route.params;
+  const { photoUri, title, note, address, coords } = route.params || {};
   const [done, setDone] = useState(false);
 
   const onUpload = async () => {
-    // TODO: upload to your backend or save to AsyncStorage
-    // await upload(photoUri, title, note, address);
+    // coords may be {lat, lng} or {latitude, longitude} depending on where you passed it from
+    const lat = coords?.lat ?? coords?.latitude;
+    const lng = coords?.lng ?? coords?.longitude;
+
+    await addLog({
+      habitId: 'japan',         // <- will use your japan icon
+      // title: title || 'Sauna',
+      title: title,
+      status: 'done',
+      lat,
+      lng,
+      note,
+      address,
+      photoUri,
+    });
+
     setDone(true);
-    setTimeout(() => navigation.pop(3), 800); // go back 3 screens to Map
+    setTimeout(() => {
+      // go back ONE screen to Detail? or straight to Map:
+      // simplest: go back until you see the map
+      navigation.pop(3); // Camera -> Edit -> Confirm -> back to Map
+      // If your depth differs, tweak the number or use navigation.navigate('Map')
+    }, 800);
   };
 
   return (

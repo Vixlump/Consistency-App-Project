@@ -15,43 +15,84 @@ import {
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Ionicons } from '@expo/vector-icons';
+import { updateLog } from '../utils/logs';
+import { CommonActions } from '@react-navigation/native';
 
 
 export default function MapLogEditScreen({ route, navigation }) {
-  const { photoUri, coords } = route.params || {};
-  const [title, setTitle] = useState('');
-  const [notes, setNotes] = useState('');
-  const [locationText, setLocationText] = useState('');
+  // params from camera (create) OR detail (edit)
+  const {
+    mode = 'create',                // 'create' | 'edit'
+    logId,                          // only for edit
+    photoUri,
+    coords,                         // { lat, lng }
+    initialValues = {},             // { title, notes, locationText }
+  } = route.params || {};
 
-  const onSave = () => {
-    // TODO: save log, then navigate to confirm
+  // prefill fields if provided
+  const [title, setTitle] = useState(initialValues.title ?? '');
+  const [notes, setNotes] = useState(initialValues.notes ?? '');
+  const [locationText, setLocationText] = useState(initialValues.locationText ?? '');
+
+  const onSave = async () => {
+    if (mode === 'edit' && logId) {
+      // update existing log in storage
+      const updated = await updateLog(logId, {
+        title,
+        note: notes,
+        address: locationText,
+      });
+      // go back to detail with fresh data
+      navigation.replace('MapLogDetail', { log: updated });
+      return;
+    }
+
+    // create flow → go to confirm screen
     navigation.navigate('MapUploadConfirm', {
       photoUri,
       title,
-      notes,
-      locationText,
-      coords,
-    });
-
-    navigation.navigate('MapUploadConfirm', {
-      photoUri,
-      title,
-      note: notes,           // rename to `note`
-      address: locationText, // rename to `address`
+      note: notes,
+      address: locationText,
       coords,
     });
   };
 
+  const closeToMap = () => {
+    // Try to pop 2 screens (e.g., Edit -> Detail -> Map)
+    try {
+      const state = navigation.getState();
+      const depth = state?.routes?.length ?? 1;
+
+      if (depth >= 3) {
+        navigation.pop(2);
+        return;
+      }
+
+      // If stack isn’t deep enough, try just goBack
+      if (navigation.canGoBack()) {
+        navigation.goBack();
+        return;
+      }
+
+      // Last resort: explicitly navigate to Map
+      navigation.navigate('Map');
+    } catch (e) {
+      // If anything weird happens, navigate to Map by name
+      navigation.navigate('Map');
+    }
+  };
+
+
+
+
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.root}>
-        <ImageBackground source={{ uri: photoUri }} style={styles.photo} />
+        {!!photoUri && <ImageBackground source={{ uri: photoUri }} style={styles.photo} />}
 
-        {/* Close button */}
-        <TouchableOpacity
-          style={styles.closeBtn}
-          onPress={() => navigation.goBack()}   // or navigation.navigate('LogsMap')
-        >
+        {/* Close */}
+        <TouchableOpacity style={styles.closeBtn}
+          onPress={() => navigation.goBack()}        >
           <Ionicons name="close" size={40} color="#fff" />
         </TouchableOpacity>
 
@@ -117,8 +158,8 @@ const styles = StyleSheet.create({
   kav: { flex: 1 },
   centerWrap: {
     flex: 1,
-    justifyContent: 'center',     // centers vertically
-    alignItems: 'center',          // centers horizontally
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: 20,
   },
   card: {
@@ -154,15 +195,13 @@ const styles = StyleSheet.create({
     minHeight: 90,
     textAlignVertical: 'top',
   },
-
   closeBtn: {
     position: 'absolute',
-    top: 60, // adjust depending on your notch
+    top: 60,
     right: 24,
     zIndex: 20,
     padding: 8,
   },
-
   saveBtn: {
     marginTop: 16,
     backgroundColor: '#fff',
