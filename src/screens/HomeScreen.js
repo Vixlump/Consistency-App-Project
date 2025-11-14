@@ -9,30 +9,26 @@ import {
   StatusBar,
   ScrollView,
   TouchableOpacity,
-  ImageBackground // Import ImageBackground for the card
+  ImageBackground,
 } from 'react-native';
 
 // --- Icon Imports ---
-// import MaterialIcons from '@expo/vector-icons';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// BECAME THIS (to include both icon sets):
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient'; // <-- TO THIS
+import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 // -----------------------------------------------------------------
 // --- 1. Ticker Component (HeaderQuoteScroll) ---
 // -----------------------------------------------------------------
 const REPEAT_COUNT = 4;
 
-
 function HeaderQuoteScroll({
   messages = [
     'Better everyday',
     'Keep going',
+    'Push through it'
   ],
-  // --- THIS IS THE CHANGE ---
-  // I've added more spaces on each side of the separator
-  separator = '     ✦     ', 
+  separator = '     ✦     ',
   speed = 10,
 }) {
   const [contentWidth, setContentWidth] = useState(0);
@@ -67,20 +63,21 @@ function HeaderQuoteScroll({
         ]}
       >
         {Array(REPEAT_COUNT).fill(null).map((_, index) => (
-          
-          <View 
+
+          <View
             key={index}
-            onLayout={ 
+            style={{ flexShrink: 0 }} // Fix for "..." bug
+            onLayout={
               index === 0
                 ? (e) => {
-                    const newWidth = e.nativeEvent.layout.width;
-                    if (newWidth > 0 && newWidth !== contentWidth) {
-                      setContentWidth(newWidth);
-                    }
-                    if (newWidth > 0 && !ready) {
-                      setReady(true);
-                    }
+                  const newWidth = e.nativeEvent.layout.width;
+                  if (newWidth > 0 && newWidth !== contentWidth) {
+                    setContentWidth(newWidth);
                   }
+                  if (newWidth > 0 && !ready) {
+                    setReady(true);
+                  }
+                }
                 : undefined
             }
           >
@@ -91,7 +88,7 @@ function HeaderQuoteScroll({
               {line}
             </Text>
           </View>
-          
+
         ))}
       </Animated.View>
     </View>
@@ -115,6 +112,7 @@ const tickerStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.5,
+    // paddingHorizontal is removed for perfect loop
   },
 });
 
@@ -122,69 +120,100 @@ const tickerStyles = StyleSheet.create({
 // -----------------------------------------------------------------
 // --- 2. HabitCard Component ---
 // -----------------------------------------------------------------
-function HabitCard({ iconEmoji, title, subtitle, streak, imageSource, status }) {
-  const isSkipped = status === 'Skipped'; // Check if the card is skipped
+function HabitCard({ habit, isSelected, onPress, onComplete, onFail }) {
+  // Destructure all values from the habit object
+  const { iconEmoji, title, subtitle, streak, imageSource, status } = habit;
+
+  // Add checks for all 3 states
+  const isSkipped = status === 'Skipped';
+  const isDone = status === 'Completed';
+  const isInProgress = !isSkipped && !isDone;
 
   return (
-    <ImageBackground
-      source={imageSource}
-      style={cardStyles.card}
-      imageStyle={{ borderRadius: 20 }} // Apply borderRadius to the background image
-    >
-      {/* Gradient Overlay for text readability */}
-      <LinearGradient
-        colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.8)']} // From transparent to dark
-        locations={[0.5, 0.8, 1.0]} // Start fade from halfway, darken towards bottom
-        style={cardStyles.gradientOverlay}
+    <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+      <ImageBackground
+        source={imageSource}
+        style={cardStyles.card}
+        imageStyle={{ borderRadius: 20 }}
       >
-        {/* --- Status Badge (Top Left) --- */}
-        <View style={[
-          cardStyles.statusBadge,
-          // Dynamically change style based on status
-          isSkipped ? cardStyles.skippedStatusBadge : cardStyles.inProgressStatusBadge
-        ]}>
-          {isSkipped
-            // Show red 'X' icon if skipped
-            ? <Ionicons name="close-circle-sharp" size={14} color="#FFF" />
-            // Show yellow dot if in progress
-            : <Ionicons name="ellipse" size={8} color="#FCD34D" />
-          }
-          <Text style={cardStyles.statusText}>{status}</Text>
-        </View>
-
-        {/* Main Content & Streak (Bottom section) */}
-        <View style={cardStyles.bottomContentContainer}>
-          <View style={cardStyles.mainContent}>
-            <View style={cardStyles.mainTextContainer}>
-              {/* --- Emoji for Title --- */}
-              <Text style={cardStyles.emojiIcon}>{iconEmoji}</Text>
-              <View style={cardStyles.mainText}>
-                <Text style={cardStyles.cardTitle}>{title}</Text>
-                <Text style={cardStyles.cardSubtitle}>{subtitle}</Text>
-              </View>
-            </View>
-
-            {/* --- Streak Badge (single line) --- */}
-            <View style={cardStyles.streakBadge}>
-              <Text style={cardStyles.streakText}>Streak | {streak}</Text>
-            </View>
-          </View>
-
-          {/* Footer: Tap to complete or reset */}
-          <View style={cardStyles.footer}>
-            {/* 2. ICON CHANGE HERE: */}
-            {isSkipped
-              ? <Ionicons name="refresh-circle-outline" size={16} color="#9CA3AF" />
-              // Use MaterialIcons 'touch-app' for the "In Progress" card
-              : <MaterialIcons name="touch-app" size={25} color="#DEDEDE" />
+        <LinearGradient
+          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.8)']}
+          locations={[0.5, 0.8, 1.0]}
+          style={cardStyles.gradientOverlay}
+        >
+          {/* Status Badge */}
+          <BlurView
+            style={[
+              cardStyles.statusBadge,
+              isSkipped ? cardStyles.skippedStatusBadge :
+                isDone ? cardStyles.doneStatusBadge :
+                  cardStyles.inProgressStatusBadge
+            ]}
+            tint="dark"
+            intensity={90}
+          >
+            {isSkipped ? <Ionicons name="close-circle-sharp" size={14} color="#FFF" /> :
+              isDone ? <Ionicons name="checkmark-circle" size={14} color="#FFF" /> :
+                <Ionicons name="ellipse" size={8} color="#FCD34D" />
             }
-            <Text style={cardStyles.footerText}>
-              {isSkipped ? 'Tap to reset' : 'Tap to complete or skip'}
-            </Text>
+            <Text style={cardStyles.statusText}>{status}</Text>
+          </BlurView>
+
+          {/* Bottom Content */}
+          <View style={cardStyles.bottomContentContainer}>
+            <View style={cardStyles.mainContent}>
+              <View style={cardStyles.mainTextContainer}>
+                <Text style={cardStyles.emojiIcon}>{iconEmoji}</Text>
+                <View style={cardStyles.mainText}>
+                  <Text style={cardStyles.cardTitle}>{title}</Text>
+                  <Text style={cardStyles.cardSubtitle}>{subtitle}</Text>
+                </View>
+              </View>
+              <BlurView style={cardStyles.streakBadge} tint="dark" intensity={90}>
+                <Text style={cardStyles.streakText}>Streak | {streak}</Text>
+              </BlurView>
+            </View>
+
+            {/* Visual Footer */}
+            <View style={cardStyles.footer}>
+              {(isSkipped || isDone) // Check for Done OR Skipped
+                ? <MaterialIcons name="touch-app" size={25} color="#DEDEDE" />
+                : <MaterialIcons name="touch-app" size={25} color="#DEDEDE" />
+              }
+              <Text style={cardStyles.footerText}>
+                {(isSkipped || isDone) ? 'Tap to reset' : 'Tap to complete or skip'}
+              </Text>
+            </View>
           </View>
-        </View>
-      </LinearGradient>
-    </ImageBackground>
+
+          {/* Selection Overlay */}
+          {isSelected && (
+            <BlurView style={cardStyles.selectionOverlay} tint="dark" intensity={90}>
+              <View style={cardStyles.buttonContainer}>
+                {/* Fail Button */}
+                <TouchableOpacity
+                  style={[cardStyles.button, cardStyles.failButton]}
+                  onPress={onFail}
+                >
+                  <MaterialCommunityIcons name="close-thick" size={24} color="#FFF" style={cardStyles.icon} />
+                  <Text style={cardStyles.buttonText}>I failed today, but I'll try again tomorrow</Text>
+                </TouchableOpacity>
+
+                {/* Complete Button */}
+                <TouchableOpacity
+                  style={[cardStyles.button, cardStyles.completeButton]}
+                  onPress={onComplete}
+                >
+                  <FontAwesome name="check" size={24} color="#FFF" style={cardStyles.icon} />
+                  <Text style={cardStyles.buttonText}>I've completed the task.</Text>
+                </TouchableOpacity>
+              </View>
+            </BlurView>
+          )}
+
+        </LinearGradient>
+      </ImageBackground>
+    </TouchableOpacity>
   );
 }
 
@@ -215,16 +244,18 @@ const cardStyles = StyleSheet.create({
     gap: 6,
     alignSelf: 'flex-start',
     borderWidth: 1,
+    overflow: 'hidden', // Added for BlurView
   },
-  // --- New Style for 'In Progress' ---
   inProgressStatusBadge: {
-    backgroundColor: 'rgba(252, 211, 77, 0.2)',
     borderColor: 'rgba(252, 211, 77, 0.4)',
   },
-  // --- New Style for 'Skipped' ---
   skippedStatusBadge: {
-    backgroundColor: 'rgba(239, 68, 68, 0.2)',
+    backgroundColor: 'rgba(239, 68, 68, 0.2)', // Red for skipped
     borderColor: 'rgba(239, 68, 68, 0.4)',
+  },
+  doneStatusBadge: {
+    backgroundColor: 'rgba(34, 197, 94, 0.2)', // Translucent Green
+    borderColor: 'rgba(34, 197, 94, 0.4)',
   },
   statusText: {
     color: '#FFF',
@@ -246,9 +277,8 @@ const cardStyles = StyleSheet.create({
     flex: 1,
     marginRight: 12,
   },
-  // --- New Style for Emoji ---
   emojiIcon: {
-    fontSize: 24, // Size for the emoji
+    fontSize: 24,
     marginRight: 10,
   },
   mainText: {
@@ -267,7 +297,6 @@ const cardStyles = StyleSheet.create({
     lineHeight: 15,
   },
   streakBadge: {
-    backgroundColor: 'rgba(255, 255, 255, 0.11)',
     borderRadius: 16,
     paddingVertical: 8,
     paddingHorizontal: 12,
@@ -276,6 +305,7 @@ const cardStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(80, 80, 80, 0.8)',
     alignSelf: 'flex-end',
+    overflow: 'hidden', // Added for BlurView
   },
   streakText: {
     color: '#FFF',
@@ -294,6 +324,46 @@ const cardStyles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 12,
     fontWeight: 'bold'
+  },
+
+  // --- STYLES FOR THE SELECTION OVERLAY ---
+  selectionOverlay: {
+    ...StyleSheet.absoluteFillObject, // This makes it cover the whole card
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 20, // Match the card's border radius
+    overflow: 'hidden', // Ensure blur respects the radius
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    width: '100%',
+    paddingHorizontal: 15,
+    gap: 15,
+  },
+  button: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 20,
+    margin: 0,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 150,
+  },
+  failButton: {
+    backgroundColor: 'rgba(239, 68, 68, 0.8)', // Translucent Red
+  },
+  completeButton: {
+    backgroundColor: 'rgba(34, 197, 94, 0.8)', // Translucent Green
+  },
+  icon: {
+    marginBottom: 12,
+  },
+  buttonText: {
+    color: '#FFF',
+    fontWeight: '600',
+    textAlign: 'center',
+    fontSize: 14,
   },
 });
 
@@ -321,50 +391,23 @@ const tabStyles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 20,
     borderWidth: 0.5,
-    borderColor: '#FFF', 
+    borderColor: '#FFF',
   },
   activeTab: {
-    backgroundColor: '#FFF', // Active tab is white
+    backgroundColor: '#FFF',
   },
   tabText: {
-    color: '#FFF', // Inactive text is gray
+    color: '#FFF',
     fontWeight: 'bold',
   },
   activeTabText: {
-    color: '#000', // Active text is black
+    color: '#000',
   },
 });
 
-// // -----------------------------------------------------------------
-// // --- 4. BottomNavBar Component ---
-// // -----------------------------------------------------------------
-// function BottomNavBar() {
-//   return (
-//     <View style={navStyles.bottomTabBar}>
-//       <Text style={navStyles.placeholderText}>[Bottom Tab Bar Placeholder]</Text>
-//     </View>
-//   );
-// }
-
-// // --- BottomNavBar Styles ---
-// const navStyles = StyleSheet.create({
-//   bottomTabBar: {
-//     height: 80,
-//     backgroundColor: '#111827',
-//     borderTopWidth: 1,
-//     borderTopColor: '#374151',
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//     flexDirection: 'row',
-//   },
-//   placeholderText: {
-//     color: '#9CA3AF',
-//     fontSize: 16,
-//   },
-// });
 
 // -----------------------------------------------------------------
-// --- 5. Data Definitions ---
+// --- 4. Data Definitions ---
 // -----------------------------------------------------------------
 
 // --- Calendar Data (Mock) ---
@@ -375,19 +418,17 @@ const DATES = [
 ];
 
 // --- To-Do Data (Mock) ---
-const TODOS = [
+const TODOS_DATA = [
   {
     id: '1',
-    // iconEmoji: '🥊',
     title: '🥊 Boxing',
     subtitle: 'Start strong, breathe deep, and hit the day with determination!',
     streak: '3 days',
     status: 'In Progress',
-    imageSource: require('../../assets/images/boxing.png'), // Path relative to HomeScreen.js
+    imageSource: require('../../assets/images/boxing.png'),
   },
   {
     id: '2',
-    // iconEmoji: '📈',
     title: '📈 Work',
     subtitle: 'Make today count.',
     streak: '3 days',
@@ -396,7 +437,6 @@ const TODOS = [
   },
   {
     id: '3',
-    // iconEmoji: '🌳',
     title: '🏋🏻 Exercise',
     subtitle: 'Stay active, stay consistent.',
     streak: '1 day',
@@ -407,11 +447,61 @@ const TODOS = [
 
 
 // -----------------------------------------------------------------
-// --- 6. Main HomeScreen Component ---
+// --- 5. Main HomeScreen Component ---
 // -----------------------------------------------------------------
 function HomeScreen() {
   const [selectedDate, setSelectedDate] = useState(9);
   const [selectedTab, setSelectedTab] = useState('To-dos');
+
+  // State for habit lists
+  const [todos, setTodos] = useState(TODOS_DATA);
+  const [done, setDone] = useState([]);
+  const [skipped, setSkipped] = useState([]);
+
+  // State for selected card ID
+  const [selectedHabitId, setSelectedHabitId] = useState(null);
+
+  // Logic to show the correct list
+  const visibleHabits = useMemo(() => {
+    if (selectedTab === 'To-dos') return todos;
+    if (selectedTab === 'Done') return done;
+    if (selectedTab === 'Skipped') return skipped;
+    return [];
+  }, [selectedTab, todos, done, skipped]);
+
+  // Logic to select a card
+  const handleSelectCard = (habitId) => {
+    if (selectedHabitId === habitId) {
+      setSelectedHabitId(null);
+    } else {
+      setSelectedHabitId(habitId);
+    }
+  };
+
+  // Completion logic
+  const handleCompleteHabit = (habit) => {
+    if (!habit || !todos.find(h => h.id === habit.id)) return;
+    setDone(prev => [...prev, { ...habit, status: 'Completed' }]);
+    setTodos(prev => prev.filter(h => h.id !== habit.id));
+    setSelectedHabitId(null); // Close the card
+  };
+
+  // Fail logic
+  const handleFailHabit = (habit) => {
+    if (!habit || !todos.find(h => h.id === habit.id)) return;
+    setSkipped(prev => [...prev, { ...habit, status: 'Skipped' }]);
+    setTodos(prev => prev.filter(h => h.id !== habit.id));
+    setSelectedHabitId(null); // Close the card
+  };
+
+  // Reset logic
+  const handleResetHabit = (habit) => {
+    // 1. Add habit back to 'todos' list
+    setTodos(prev => [...prev, { ...habit, status: 'In Progress' }]);
+    // 2. Remove it from 'done' or 'skipped' list
+    setDone(prev => prev.filter(h => h.id !== habit.id));
+    setSkipped(prev => prev.filter(h => h.id !== habit.id));
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -454,41 +544,43 @@ function HomeScreen() {
         {/* Tabs (To-dos, Done, Skipped) */}
         <View style={styles.tabsContainer}>
           <TabButton
-            label="To-dos (3)"
+            label={`To-dos (${todos.length})`}
             isActive={selectedTab === 'To-dos'}
             onPress={() => setSelectedTab('To-dos')}
           />
           <TabButton
-            label="Done (1)"
+            label={`Done (${done.length})`}
             isActive={selectedTab === 'Done'}
             onPress={() => setSelectedTab('Done')}
           />
           <TabButton
-            label="Skipped (1)"
+            label={`Skipped (${skipped.length})`}
             isActive={selectedTab === 'Skipped'}
             onPress={() => setSelectedTab('Skipped')}
           />
         </View>
 
         {/* --- To-Do Cards --- */}
-        {TODOS.map((todo) => (
-          <HabitCard
-            key={todo.id}
-            iconEmoji={todo.iconEmoji}
-            title={todo.title}
-            subtitle={todo.subtitle}
-            streak={todo.streak}
-            status={todo.status}
-            imageSource={todo.imageSource}
-          />
-        ))}
+        {visibleHabits.map((todo) => {
+          const isTodoTab = selectedTab === 'To-dos';
+          return (
+            <HabitCard
+              key={todo.id}
+              habit={todo} // Pass the whole todo object
+              isSelected={isTodoTab && selectedHabitId === todo.id}
+              onPress={isTodoTab ? () => handleSelectCard(todo.id) : () => handleResetHabit(todo)}
+              onComplete={() => handleCompleteHabit(todo)}
+              onFail={() => handleFailHabit(todo)}
+            />
+          );
+        })}
 
         {/* Add a little space at the bottom */}
         <View style={{ height: 20 }} />
 
       </ScrollView>
 
-      {/* 3. Bottom Tab Bar */}
+      {/* 3. Bottom Tab Bar (Commented out) */}
       {/* <BottomNavBar /> */}
 
     </SafeAreaView>
@@ -536,7 +628,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 3,
     borderColor: '#222226',
-    // backgroundColor: '#1F2937',
     justifyContent: 'center',
     alignItems: 'center',
     marginHorizontal: 8,
