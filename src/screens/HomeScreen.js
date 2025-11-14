@@ -195,7 +195,7 @@ function HabitCard({ habit, isSelected, onPress, onComplete, onFail }) {
                   style={[cardStyles.button, cardStyles.failButton]}
                   onPress={onFail}
                 >
-                  <MaterialCommunityIcons name="close-thick" size={24} color="#FFF" style={cardStyles.icon} />
+                  <MaterialCommunityIcons name="close-thick" size={26} color="#FFF" style={cardStyles.icon} />
                   <Text style={cardStyles.buttonText}>I failed today, but I'll try again tomorrow</Text>
                 </TouchableOpacity>
 
