@@ -42,8 +42,13 @@ export default function MapLogEditScreen({ route, navigation }) {
         note: notes,
         address: locationText,
       });
+
+      // // Go back to the map screen as requested
+      // navigation.navigate('Map'); 
+      // return;
+      
       // go back to detail with fresh data
-      navigation.replace('MapLogDetail', { log: updated });
+      navigation.replace('Map', { log: updated });
       return;
     }
 

@@ -24,6 +24,7 @@ import AddHabitScreen from './src/screens/AddHabitScreen';
 import LocationPickerScreen from './src/screens/LocationPickerScreen';
 import HomeScreen from './src/screens/HomeScreen';
 import MapScreen from './src/screens/MapScreen';
+import LogsMapScreen from './src/screens/LogsMapScreen';
 import MapCameraScreen from './src/screens/MapCameraScreen';
 import MapUploadConfirmScreen from './src/screens/MapUploadConfirmScreen';
 import MapLogEditScreen from './src/screens/MapLogEditScreen';
@@ -132,7 +133,7 @@ export default function App() {
 
           <Stack.Screen
             name="Map"
-            component={MapScreen}
+            component={LogsMapScreen}
             options={{ headerShown: false }}
           />
 

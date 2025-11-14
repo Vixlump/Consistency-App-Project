@@ -109,7 +109,14 @@ export default function LogsMapScreen() {
             onPress={() => navigation.navigate('MapLogDetail', { log: l })}
           >
             <View style={styles.pinWrap}>
-              <Image source={IMAGES[l.habitId] || IMAGES.japan} style={styles.pinImg} />
+              <Image
+                source={
+                  l.photoUri
+                    ? { uri: l.photoUri }           // use user photo if available
+                    : IMAGES[l.habitId] || IMAGES.japan  // fallback to old icons
+                }
+                style={styles.pinImg}
+              />
             </View>
 
             {/* optional native callout too */}
