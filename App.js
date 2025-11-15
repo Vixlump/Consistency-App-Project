@@ -1,3 +1,4 @@
+import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native-paper';
@@ -10,6 +11,7 @@ import { Text } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/utils/firebase';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 
 
@@ -101,86 +103,88 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Login">
-          {/* <Stack.Navigator initialRouteName="Map"> */}
-          <Stack.Screen
-            name="Login"
-            component={LoginScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="SignUp"
-            component={SignUpScreen}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="Main"
-            component={MainTabs}
-            options={{ headerShown: false }}
-          />
-          <Stack.Screen
-            name="AddHabit"
-            component={AddHabitScreen}
-            options={{ title: 'Add New Habit' }}
-          />
-          <Stack.Screen
-            name="LocationPicker"
-            component={LocationPickerScreen}
-            options={{ title: 'Select Location' }}
-          />
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Login">
+            {/* <Stack.Navigator initialRouteName="Map"> */}
+            <Stack.Screen
+              name="Login"
+              component={LoginScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="SignUp"
+              component={SignUpScreen}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="Main"
+              component={MainTabs}
+              options={{ headerShown: false }}
+            />
+            <Stack.Screen
+              name="AddHabit"
+              component={AddHabitScreen}
+              options={{ title: 'Add New Habit' }}
+            />
+            <Stack.Screen
+              name="LocationPicker"
+              component={LocationPickerScreen}
+              options={{ title: 'Select Location' }}
+            />
 
 
-          <Stack.Screen
-            name="Map"
-            component={LogsMapScreen}
-            options={{ headerShown: false }}
-          />
+            <Stack.Screen
+              name="Map"
+              component={LogsMapScreen}
+              options={{ headerShown: false }}
+            />
 
-          {/* <Stack.Screen
+            {/* <Stack.Screen
             name="LogsMap"
             component={LogsMapScreen}
             options={{ headerShown: false }}
           /> */}
-          <Stack.Screen
-            name="MapCamera"
-            component={MapCameraScreen}
-            options={{
-              headerShown: false,
-              presentation: 'fullScreenModal',   // <- not a sheet
-              contentStyle: { backgroundColor: 'black' }, // prevent any peek-through
-            }}
-          />
-          <Stack.Screen
-            name="MapLogEdit"
-            component={MapLogEditScreen}
-            options={{
-              headerShown: false,
-              presentation: 'fullScreenModal',   // <- not a sheet
-              contentStyle: { backgroundColor: 'black' }, // prevent any peek-through
-            }} />
-          <Stack.Screen
-            name="MapUploadConfirm"
-            component={MapUploadConfirmScreen}
-            options={{ headerShown: false, presentation: 'containedModal' }}
-          />
-          <Stack.Screen
-            name="MapLogDetail"
-            component={MapLogDetailScreen}
-            options={{ headerShown: false, presentation: 'containedModal' }}
-          />
+            <Stack.Screen
+              name="MapCamera"
+              component={MapCameraScreen}
+              options={{
+                headerShown: false,
+                presentation: 'fullScreenModal',   // <- not a sheet
+                contentStyle: { backgroundColor: 'black' }, // prevent any peek-through
+              }}
+            />
+            <Stack.Screen
+              name="MapLogEdit"
+              component={MapLogEditScreen}
+              options={{
+                headerShown: false,
+                presentation: 'fullScreenModal',   // <- not a sheet
+                contentStyle: { backgroundColor: 'black' }, // prevent any peek-through
+              }} />
+            <Stack.Screen
+              name="MapUploadConfirm"
+              component={MapUploadConfirmScreen}
+              options={{ headerShown: false, presentation: 'containedModal' }}
+            />
+            <Stack.Screen
+              name="MapLogDetail"
+              component={MapLogDetailScreen}
+              options={{ headerShown: false, presentation: 'containedModal' }}
+            />
 
-          <Stack.Screen
-            name="CreateHabit"
-            component={CreateHabitScreen}
-            options={{
-              headerShown: false,
-              presentation: 'modal'
-            }}
-          />
+            <Stack.Screen
+              name="CreateHabit"
+              component={CreateHabitScreen}
+              options={{
+                headerShown: false,
+                presentation: 'modal'
+              }}
+            />
 
-        </Stack.Navigator>
-      </NavigationContainer>
+          </Stack.Navigator>
+        </NavigationContainer>
+      </GestureHandlerRootView>
       <StatusBar style="auto" />
     </View>
   );

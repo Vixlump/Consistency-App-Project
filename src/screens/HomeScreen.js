@@ -10,12 +10,14 @@ import {
   ScrollView,
   TouchableOpacity,
   ImageBackground,
+  Alert,
 } from 'react-native';
 
 // --- Icon Imports ---
 import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
+import { Swipeable } from 'react-native-gesture-handler';
 
 // -----------------------------------------------------------------
 // --- 1. Ticker Component (HeaderQuoteScroll) ---
@@ -120,100 +122,135 @@ const tickerStyles = StyleSheet.create({
 // -----------------------------------------------------------------
 // --- 2. HabitCard Component ---
 // -----------------------------------------------------------------
-function HabitCard({ habit, isSelected, onPress, onComplete, onFail }) {
-  // Destructure all values from the habit object
+function HabitCard({
+  habit,
+  isSelected,
+  onPress,
+  onComplete,
+  onFail,
+  onDelete,
+  onEdit,
+  onSwipeOpen,
+  swipeableRef
+}) {
   const { iconEmoji, title, subtitle, streak, imageSource, status } = habit;
-
-  // Add checks for all 3 states
   const isSkipped = status === 'Skipped';
   const isDone = status === 'Completed';
-  const isInProgress = !isSkipped && !isDone;
+
+  // --- NEW: This renders the "Edit" and "Delete" buttons ---
+  const renderRightActions = (progress, dragX) => {
+    // Animate the opacity
+    const opacity = dragX.interpolate({
+      inputRange: [-150, 0],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <Animated.View style={[cardStyles.rightActionContainer, { opacity }]}>
+        {/* Edit Button */}
+        <TouchableOpacity style={cardStyles.editButton} onPress={onEdit}>
+          <Ionicons name="pencil" size={24} color="#000" />
+          <Text style={cardStyles.actionButtonText}>Edit Habit</Text>
+        </TouchableOpacity>
+        {/* Delete Button */}
+        <TouchableOpacity style={cardStyles.deleteButton} onPress={onDelete}>
+          <Ionicons name="trash-bin" size={24} color="#FFF" />
+          <Text style={[cardStyles.actionButtonText, { color: '#FFF' }]}>Delete</Text>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
   return (
-    <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
-      <ImageBackground
-        source={imageSource}
-        style={cardStyles.card}
-        imageStyle={{ borderRadius: 20 }}
-      >
-        <LinearGradient
-          colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.8)']}
-          locations={[0.5, 0.8, 1.0]}
-          style={cardStyles.gradientOverlay}
+    // --- NEW: Wrapped in Swipeable ---
+    <Swipeable
+      ref={swipeableRef} // Attach the ref
+      renderRightActions={renderRightActions} // Render the buttons
+      onSwipeableWillOpen={onSwipeOpen} // Tell HomeScreen this card is open
+      friction={2} // Make it feel solid
+    >
+      <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
+        <ImageBackground
+          source={imageSource}
+          style={cardStyles.card}
+          imageStyle={{ borderRadius: 20 }}
         >
-          {/* Status Badge */}
-          <BlurView
-            style={[
-              cardStyles.statusBadge,
-              isSkipped ? cardStyles.skippedStatusBadge :
-                isDone ? cardStyles.doneStatusBadge :
-                  cardStyles.inProgressStatusBadge
-            ]}
-            tint="dark"
-            intensity={90}
+          <LinearGradient
+            colors={['rgba(0,0,0,0)', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.8)']}
+            locations={[0.5, 0.8, 1.0]}
+            style={cardStyles.gradientOverlay}
           >
-            {isSkipped ? <Ionicons name="close-circle-sharp" size={14} color="#FFF" /> :
-              isDone ? <Ionicons name="checkmark-circle" size={14} color="#FFF" /> :
-                <Ionicons name="ellipse" size={8} color="#FCD34D" />
-            }
-            <Text style={cardStyles.statusText}>{status}</Text>
-          </BlurView>
-
-          {/* Bottom Content */}
-          <View style={cardStyles.bottomContentContainer}>
-            <View style={cardStyles.mainContent}>
-              <View style={cardStyles.mainTextContainer}>
-                <Text style={cardStyles.emojiIcon}>{iconEmoji}</Text>
-                <View style={cardStyles.mainText}>
-                  <Text style={cardStyles.cardTitle}>{title}</Text>
-                  <Text style={cardStyles.cardSubtitle}>{subtitle}</Text>
-                </View>
-              </View>
-              <BlurView style={cardStyles.streakBadge} tint="dark" intensity={90}>
-                <Text style={cardStyles.streakText}>Streak | {streak}</Text>
-              </BlurView>
-            </View>
-
-            {/* Visual Footer */}
-            <View style={cardStyles.footer}>
-              {(isSkipped || isDone) // Check for Done OR Skipped
-                ? <MaterialIcons name="touch-app" size={25} color="#DEDEDE" />
-                : <MaterialIcons name="touch-app" size={25} color="#DEDEDE" />
+            {/* Status Badge */}
+            <BlurView
+              style={[
+                cardStyles.statusBadge,
+                isSkipped ? cardStyles.skippedStatusBadge :
+                  isDone ? cardStyles.doneStatusBadge :
+                    cardStyles.inProgressStatusBadge
+              ]}
+              tint="dark"
+              intensity={90}
+            >
+              {isSkipped ? <Ionicons name="close-circle-sharp" size={14} color="#FFF" /> :
+                isDone ? <Ionicons name="checkmark-circle" size={14} color="#FFF" /> :
+                  <Ionicons name="ellipse" size={8} color="#FCD34D" />
               }
-              <Text style={cardStyles.footerText}>
-                {(isSkipped || isDone) ? 'Tap to reset' : 'Tap to complete or skip'}
-              </Text>
-            </View>
-          </View>
-
-          {/* Selection Overlay */}
-          {isSelected && (
-            <BlurView style={cardStyles.selectionOverlay} tint="dark" intensity={90}>
-              <View style={cardStyles.buttonContainer}>
-                {/* Fail Button */}
-                <TouchableOpacity
-                  style={[cardStyles.button, cardStyles.failButton]}
-                  onPress={onFail}
-                >
-                  <MaterialCommunityIcons name="close-thick" size={26} color="#FFF" style={cardStyles.icon} />
-                  <Text style={cardStyles.buttonText}>I failed today, but I'll try again tomorrow</Text>
-                </TouchableOpacity>
-
-                {/* Complete Button */}
-                <TouchableOpacity
-                  style={[cardStyles.button, cardStyles.completeButton]}
-                  onPress={onComplete}
-                >
-                  <FontAwesome name="check" size={24} color="#FFF" style={cardStyles.icon} />
-                  <Text style={cardStyles.buttonText}>I've completed the task.</Text>
-                </TouchableOpacity>
-              </View>
+              <Text style={cardStyles.statusText}>{status}</Text>
             </BlurView>
-          )}
 
-        </LinearGradient>
-      </ImageBackground>
-    </TouchableOpacity>
+            {/* Bottom Content */}
+            <View style={cardStyles.bottomContentContainer}>
+              <View style={cardStyles.mainContent}>
+                <View style={cardStyles.mainTextContainer}>
+                  <View style={cardStyles.mainText}>
+                    <Text style={cardStyles.cardTitle}>{title}</Text>
+                    <Text style={cardStyles.cardSubtitle}>{subtitle}</Text>
+                  </View>
+                </View>
+                <BlurView style={cardStyles.streakBadge} tint="dark" intensity={90}>
+                  <Text style={cardStyles.streakText}>Streak | {streak}</Text>
+                </BlurView>
+              </View>
+
+              {/* Visual Footer */}
+              <View style={cardStyles.footer}>
+                {(isSkipped || isDone)
+                  ? <Ionicons name="refresh-circle-outline" size={16} color="#9CA3AF" />
+                  : <MaterialIcons name="touch-app" size={25} color="#DEDEDE" />
+                }
+                <Text style={cardStyles.footerText}>
+                  {(isSkipped || isDone) ? 'Tap to reset' : 'Tap to complete or skip'}
+                </Text>
+              </View>
+            </View>
+
+            {/* Selection Overlay (for To-dos tab) */}
+            {isSelected && (
+              <BlurView style={cardStyles.selectionOverlay} tint="dark" intensity={90}>
+                <View style={cardStyles.buttonContainer}>
+                  <TouchableOpacity
+                    style={[cardStyles.button, cardStyles.failButton]}
+                    onPress={onFail}
+                  >
+                    <MaterialCommunityIcons name="close-thick" size={26} color="#FFF" style={cardStyles.icon} />
+                    <Text style={cardStyles.buttonText}>I failed today, but I'll try again tomorrow</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[cardStyles.button, cardStyles.completeButton]}
+                    onPress={onComplete}
+                  >
+                    <FontAwesome name="check" size={24} color="#FFF" style={cardStyles.icon} />
+                    <Text style={cardStyles.buttonText}>I've completed the task.</Text>
+                  </TouchableOpacity>
+                </View>
+              </BlurView>
+            )}
+
+          </LinearGradient>
+        </ImageBackground>
+      </TouchableOpacity>
+    </Swipeable>
   );
 }
 
@@ -276,10 +313,6 @@ const cardStyles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginRight: 12,
-  },
-  emojiIcon: {
-    fontSize: 24,
-    marginRight: 10,
   },
   mainText: {
     flex: 1,
@@ -365,7 +398,44 @@ const cardStyles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
   },
+  // --- 3. NEW STYLES for Swipeable ---
+  rightActionContainer: {
+    flexDirection: 'column', // <-- Changed from 'row' to 'column'
+    width: 120, // Adjust total width of the revealed area
+    height: 190, // Adjust total height to fit two buttons
+    marginTop: 55, // Adjust vertical position to align with card
+    marginRight: 17, // Keep right margin
+    marginLeft: 0, // No negative left margin needed now
+    gap: 10, // Space between the two buttons
+    borderRadius: 20, // Add a border-radius to the container itself if you want
+    overflow: 'hidden', // Crucial to clip inner button radii
+  },
+  editButton: {
+    flex: 1, // Take up available vertical space
+    backgroundColor: '#FFF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16, // Consistent border-radius for the button
+    paddingVertical: 10, // Adjust padding
+    marginRight: 0, // No horizontal margin
+  },
+  deleteButton: {
+    flex: 1, // Take up available vertical space
+    backgroundColor: '#EF4444', // Red
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 16, // Consistent border-radius for the button
+    paddingVertical: 10, // Adjust padding
+    marginRight: 0, // No horizontal margin
+  },
+  actionButtonText: {
+    color: '#000', // Default to black for edit
+    fontWeight: '600',
+    marginTop: 4,
+    fontSize: 12, // Make text a bit smaller
+  },
 });
+
 
 
 // -----------------------------------------------------------------
@@ -449,7 +519,7 @@ const TODOS_DATA = [
 // -----------------------------------------------------------------
 // --- 5. Main HomeScreen Component ---
 // -----------------------------------------------------------------
-function HomeScreen({ navigation }) {
+function HomeScreen({ navigation, route }) {
   const [selectedDate, setSelectedDate] = useState(9);
   const [selectedTab, setSelectedTab] = useState('To-dos');
 
@@ -461,7 +531,32 @@ function HomeScreen({ navigation }) {
   // State for selected card ID
   const [selectedHabitId, setSelectedHabitId] = useState(null);
 
-  // Logic to show the correct list
+  // --- 4. NEW: State for Swipeable ---
+  const [openSwipeableId, setOpenSwipeableId] = useState(null);
+  const swipeableRefs = useRef({}); // Stores all swipeable refs
+
+  // This effect listens for the 'newHabit' parameter
+  // --- MODIFIED: This effect now handles edits ---
+  useEffect(() => {
+    // 1. Handle new habit
+    if (route.params?.newHabit) {
+      setTodos(prevTodos => [route.params.newHabit, ...prevTodos]);
+      navigation.setParams({ newHabit: null });
+    }
+
+    // 2. Handle updated habit
+    if (route.params?.updatedHabit) {
+      const updatedHabit = route.params.updatedHabit;
+
+      // Update the habit in whichever list it's in
+      setTodos(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+      setDone(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+      setSkipped(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
+
+      navigation.setParams({ updatedHabit: null });
+    }
+  }, [route.params, navigation]); // Re-run when parameters change
+
   const visibleHabits = useMemo(() => {
     if (selectedTab === 'To-dos') return todos;
     if (selectedTab === 'Done') return done;
@@ -469,38 +564,77 @@ function HomeScreen({ navigation }) {
     return [];
   }, [selectedTab, todos, done, skipped]);
 
-  // Logic to select a card
   const handleSelectCard = (habitId) => {
-    if (selectedHabitId === habitId) {
-      setSelectedHabitId(null);
-    } else {
-      setSelectedHabitId(habitId);
-    }
+    if (openSwipeableId) return; // Don't open overlay if card is swiped
+    setSelectedHabitId(selectedHabitId === habitId ? null : habitId);
   };
 
-  // Completion logic
   const handleCompleteHabit = (habit) => {
     if (!habit || !todos.find(h => h.id === habit.id)) return;
     setDone(prev => [...prev, { ...habit, status: 'Completed' }]);
     setTodos(prev => prev.filter(h => h.id !== habit.id));
-    setSelectedHabitId(null); // Close the card
+    setSelectedHabitId(null);
   };
 
-  // Fail logic
   const handleFailHabit = (habit) => {
     if (!habit || !todos.find(h => h.id === habit.id)) return;
     setSkipped(prev => [...prev, { ...habit, status: 'Skipped' }]);
     setTodos(prev => prev.filter(h => h.id !== habit.id));
-    setSelectedHabitId(null); // Close the card
+    setSelectedHabitId(null);
   };
 
-  // Reset logic
   const handleResetHabit = (habit) => {
-    // 1. Add habit back to 'todos' list
+    if (openSwipeableId) return; // Don't reset if card is swiped
     setTodos(prev => [...prev, { ...habit, status: 'In Progress' }]);
-    // 2. Remove it from 'done' or 'skipped' list
     setDone(prev => prev.filter(h => h.id !== habit.id));
     setSkipped(prev => prev.filter(h => h.id !== habit.id));
+  };
+
+  // --- 5. NEW: Handlers for Edit and Delete ---
+  const handleDelete = (habit) => {
+    Alert.alert(
+      'Delete Habit',
+      `Are you sure you want to delete "${habit.title}"?`,
+      [
+        { text: 'Cancel', style: 'cancel', onPress: () => closeSwipeable(habit.id) },
+        {
+          text: 'Delete',
+          style: 'destructive',
+          onPress: () => {
+            // Remove from all lists
+            setTodos(prev => prev.filter(h => h.id !== habit.id));
+            setDone(prev => prev.filter(h => h.id !== habit.id));
+            setSkipped(prev => prev.filter(h => h.id !== habit.id));
+            setOpenSwipeableId(null);
+          },
+        },
+      ]
+    );
+  };
+
+  // --- MODIFIED: This function now navigates ---
+  const handleEdit = (habit) => {
+    closeSwipeable(habit.id); // Close the row
+    // Navigate to CreateHabitScreen and pass the habit data
+    navigation.navigate('CreateHabit', { habitToEdit: habit });
+  };
+
+  // --- 6. NEW: Helper to close a swiped card ---
+  const closeSwipeable = (id) => {
+    if (swipeableRefs.current[id]) {
+      swipeableRefs.current[id].close();
+      setOpenSwipeableId(null);
+    }
+  };
+
+  // --- 7. NEW: Function to close other cards ---
+  const onSwipeOpen = (id) => {
+    // Close the previously open card
+    if (openSwipeableId && openSwipeableId !== id) {
+      closeSwipeable(openSwipeableId);
+    }
+    // Set the new open card
+    setOpenSwipeableId(id);
   };
 
   return (
@@ -573,6 +707,15 @@ function HomeScreen({ navigation }) {
               onPress={isTodoTab ? () => handleSelectCard(todo.id) : () => handleResetHabit(todo)}
               onComplete={() => handleCompleteHabit(todo)}
               onFail={() => handleFailHabit(todo)}
+
+              // --- ADD THESE 4 MISSING PROPS ---
+              onDelete={() => handleDelete(todo)}
+              onEdit={() => handleEdit(todo)}
+              onSwipeOpen={() => onSwipeOpen(todo.id)}
+              swipeableRef={(ref) => {
+                swipeableRefs.current[todo.id] = ref;
+              }}
+            // --- END OF FIX ---
             />
           );
         })}

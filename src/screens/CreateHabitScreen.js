@@ -1,5 +1,5 @@
 // src/screens/CreateHabitScreen.js
-import React, { useState, useRef, useMemo } from 'react'; // <-- Import useRef
+import React, { useState, useRef, useMemo, useEffect } from 'react'; // <-- Import useRef
 import {
     View,
     Text,
@@ -17,18 +17,21 @@ import { Ionicons } from '@expo/vector-icons';
 import { BACKGROUND_IMAGES } from '../data/backgrounds';
 import * as ImagePicker from 'expo-image-picker';
 
-export default function CreateHabitScreen({ navigation }) {
-    const [habitName, setHabitName] = useState('');
-    const [description, setDescription] = useState('');
-    const [selectedImageSource, setSelectedImageSource] = useState(BACKGROUND_IMAGES[0].image);
+export default function CreateHabitScreen({ navigation, route }) {
+    // Check for "edit mode"
+    const habitToEdit = route.params?.habitToEdit;
+    const isEditMode = !!habitToEdit;
+
+    // Pre-fill state if editing, otherwise use empty strings
+    const [habitName, setHabitName] = useState(habitToEdit?.title || '');
+    const [description, setDescription] = useState(habitToEdit?.subtitle || '');
+    const [selectedImageSource, setSelectedImageSource] = useState(habitToEdit?.imageSource || BACKGROUND_IMAGES[0].image);
+
     const [customImage, setCustomImage] = useState(null);
     const [remindMe, setRemindMe] = useState(false);
-
-    // --- MODIFIED: Pagination State ---
-    const [pageWidth, setPageWidth] = useState(0); // Holds the width of the ScrollView
+    const [pageWidth, setPageWidth] = useState(0);
     const [pagination, setPagination] = useState({ page: 0, totalPages: 1 });
     const viewWidthRef = useRef(0);
-    // --- END MODIFIED ---
 
     const onImport = async () => {
         const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
@@ -51,13 +54,30 @@ export default function CreateHabitScreen({ navigation }) {
     };
 
     const onSave = () => {
-        console.log({
-            habitName,
-            description,
-            selectedImageSource,
-            remindMe,
-        });
-        navigation.goBack();
+        if (isEditMode) {
+            // --- We are EDITING ---
+            const updatedHabit = {
+                ...habitToEdit, // Keep old data (id, streak, status)
+                title: habitName,
+                subtitle: description,
+                imageSource: selectedImageSource,
+            };
+            // Send the *updated* habit back to HomeScreen
+            navigation.navigate('Home', { updatedHabit: updatedHabit });
+
+        } else {
+            // --- We are CREATING ---
+            const newHabit = {
+                id: String(Date.now()),
+                title: habitName,
+                subtitle: description,
+                streak: '0 days',
+                status: 'In Progress',
+                imageSource: selectedImageSource,
+            };
+            // Send the *new* habit back to HomeScreen
+            navigation.navigate('Home', { newHabit: newHabit });
+        }
     };
 
     // --- NEW: Memoize all images (custom + default) ---
@@ -103,8 +123,11 @@ export default function CreateHabitScreen({ navigation }) {
                 style={{ flex: 1 }}
             >
                 {/* --- Header --- */}
+                {/* --- 5. Update Header Title --- */}
                 <View style={styles.header}>
-                    <Text style={styles.headerTitle}>Create Habit</Text>
+                    <Text style={styles.headerTitle}>
+                        {isEditMode ? 'Edit Habit' : 'Create Habit'}
+                    </Text>
                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.closeButton}>
                         <Ionicons name="close" size={28} color="#FFF" />
                     </TouchableOpacity>
@@ -117,7 +140,7 @@ export default function CreateHabitScreen({ navigation }) {
                         style={styles.input}
                         value={habitName}
                         onChangeText={setHabitName}
-                        placeholder="e.g. Drink Water, Read"
+                        placeholder="e.g. 🥊 Boxing"
                         placeholderTextColor="#555"
                     />
 
@@ -226,7 +249,7 @@ export default function CreateHabitScreen({ navigation }) {
                     </View>
 
                     {/* --- Advance Options --- */}
-                    <Text style={styles.label}>(ADVANCE OPTIONS)</Text>
+                    <Text style={styles.label}>ADVANCE OPTIONS</Text>
                     <View style={styles.optionsContainer}>
                         <TouchableOpacity style={styles.optionRow}>
                             <Text style={styles.optionText}>Repeat</Text>
@@ -239,7 +262,7 @@ export default function CreateHabitScreen({ navigation }) {
                         <View style={[styles.optionRow, styles.optionRowLast]}>
                             <Text style={styles.optionText}>Remind me</Text>
                             <Switch
-                                trackColor={{ false: '#3e3e3e', true: '#81b0ff' }}
+                                trackColor={{ false: '#3e3e3e', true: '008000' }}
                                 thumbColor={remindMe ? '#f4f3f4' : '#f4f3f4'}
                                 onValueChange={() => setRemindMe(previousState => !previousState)}
                                 value={remindMe}
@@ -382,7 +405,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#333333',
         paddingVertical: 10,
         paddingHorizontal: 20,
-        borderRadius: 20,
+        borderRadius: 10,
         gap: 8,
     },
     importButtonText: {
