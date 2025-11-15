@@ -29,7 +29,7 @@ import MapCameraScreen from './src/screens/MapCameraScreen';
 import MapUploadConfirmScreen from './src/screens/MapUploadConfirmScreen';
 import MapLogEditScreen from './src/screens/MapLogEditScreen';
 import MapLogDetailScreen from './src/screens/MapLogDetailScreen.js';
-
+import CreateHabitScreen from './src/screens/CreateHabitScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -168,6 +168,15 @@ export default function App() {
             name="MapLogDetail"
             component={MapLogDetailScreen}
             options={{ headerShown: false, presentation: 'containedModal' }}
+          />
+
+          <Stack.Screen
+            name="CreateHabit"
+            component={CreateHabitScreen}
+            options={{
+              headerShown: false,
+              presentation: 'modal'
+            }}
           />
 
         </Stack.Navigator>

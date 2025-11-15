@@ -449,7 +449,7 @@ const TODOS_DATA = [
 // -----------------------------------------------------------------
 // --- 5. Main HomeScreen Component ---
 // -----------------------------------------------------------------
-function HomeScreen() {
+function HomeScreen({ navigation }) {
   const [selectedDate, setSelectedDate] = useState(9);
   const [selectedTab, setSelectedTab] = useState('To-dos');
 
@@ -515,8 +515,10 @@ function HomeScreen() {
         {/* Date and Create Button */}
         <View style={styles.header}>
           <Text style={styles.dateText}>THURSDAY, 09 OCT</Text>
-          <TouchableOpacity style={styles.createButton}>
-            <Text style={styles.createText}>CREATE</Text>
+          <TouchableOpacity
+            style={styles.createButton}
+            onPress={() => navigation.navigate('CreateHabit')} // This navigates to the new screen
+          ><Text style={styles.createText}>CREATE</Text>
             <Ionicons name="add-circle" size={22} color="#FFF" />
           </TouchableOpacity>
         </View>
