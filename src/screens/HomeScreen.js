@@ -65,7 +65,6 @@ function HeaderQuoteScroll({
         ]}
       >
         {Array(REPEAT_COUNT).fill(null).map((_, index) => (
-
           <View
             key={index}
             style={{ flexShrink: 0 }} // Fix for "..." bug
@@ -90,7 +89,6 @@ function HeaderQuoteScroll({
               {line}
             </Text>
           </View>
-
         ))}
       </Animated.View>
     </View>
@@ -114,7 +112,6 @@ const tickerStyles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
     letterSpacing: 0.5,
-    // paddingHorizontal is removed for perfect loop
   },
 });
 
@@ -137,9 +134,7 @@ function HabitCard({
   const isSkipped = status === 'Skipped';
   const isDone = status === 'Completed';
 
-  // --- NEW: This renders the "Edit" and "Delete" buttons ---
   const renderRightActions = (progress, dragX) => {
-    // Animate the opacity
     const opacity = dragX.interpolate({
       inputRange: [-150, 0],
       outputRange: [1, 0],
@@ -148,12 +143,10 @@ function HabitCard({
 
     return (
       <Animated.View style={[cardStyles.rightActionContainer, { opacity }]}>
-        {/* Edit Button */}
         <TouchableOpacity style={cardStyles.editButton} onPress={onEdit}>
           <Ionicons name="pencil" size={24} color="#000" />
           <Text style={cardStyles.actionButtonText}>Edit Habit</Text>
         </TouchableOpacity>
-        {/* Delete Button */}
         <TouchableOpacity style={cardStyles.deleteButton} onPress={onDelete}>
           <Ionicons name="trash-bin" size={24} color="#FFF" />
           <Text style={[cardStyles.actionButtonText, { color: '#FFF' }]}>Delete</Text>
@@ -163,12 +156,11 @@ function HabitCard({
   };
 
   return (
-    // --- NEW: Wrapped in Swipeable ---
     <Swipeable
-      ref={swipeableRef} // Attach the ref
-      renderRightActions={renderRightActions} // Render the buttons
-      onSwipeableWillOpen={onSwipeOpen} // Tell HomeScreen this card is open
-      friction={2} // Make it feel solid
+      ref={swipeableRef}
+      renderRightActions={renderRightActions}
+      onSwipeableWillOpen={onSwipeOpen}
+      friction={2}
     >
       <TouchableOpacity onPress={onPress} activeOpacity={0.9}>
         <ImageBackground
@@ -192,8 +184,8 @@ function HabitCard({
               tint="dark"
               intensity={90}
             >
-              {isSkipped ? <Ionicons name="close-circle-sharp" size={14} color="#FFF" /> :
-                isDone ? <Ionicons name="checkmark-circle" size={14} color="#FFF" /> :
+              {isSkipped ? <MaterialCommunityIcons name="close-thick" size={14} color="#FFF" /> :
+                isDone ? <FontAwesome name="check" size={14} color="#FFF" /> :
                   <Ionicons name="ellipse" size={8} color="#FCD34D" />
               }
               <Text style={cardStyles.statusText}>{status}</Text>
@@ -203,6 +195,7 @@ function HabitCard({
             <View style={cardStyles.bottomContentContainer}>
               <View style={cardStyles.mainContent}>
                 <View style={cardStyles.mainTextContainer}>
+                  <Text style={cardStyles.emojiIcon}>{iconEmoji}</Text>
                   <View style={cardStyles.mainText}>
                     <Text style={cardStyles.cardTitle}>{title}</Text>
                     <Text style={cardStyles.cardSubtitle}>{subtitle}</Text>
@@ -281,17 +274,17 @@ const cardStyles = StyleSheet.create({
     gap: 6,
     alignSelf: 'flex-start',
     borderWidth: 1,
-    overflow: 'hidden', // Added for BlurView
+    overflow: 'hidden',
   },
   inProgressStatusBadge: {
     borderColor: 'rgba(252, 211, 77, 0.4)',
   },
   skippedStatusBadge: {
-    backgroundColor: 'rgba(239, 68, 68, 0.2)', // Red for skipped
+    backgroundColor: 'rgba(239, 68, 68, 0.2)',
     borderColor: 'rgba(239, 68, 68, 0.4)',
   },
   doneStatusBadge: {
-    backgroundColor: 'rgba(34, 197, 94, 0.2)', // Translucent Green
+    backgroundColor: 'rgba(34, 197, 94, 0.2)',
     borderColor: 'rgba(34, 197, 94, 0.4)',
   },
   statusText: {
@@ -313,6 +306,10 @@ const cardStyles = StyleSheet.create({
     alignItems: 'center',
     flex: 1,
     marginRight: 12,
+  },
+  emojiIcon: {
+    fontSize: 24,
+    marginRight: 10,
   },
   mainText: {
     flex: 1,
@@ -338,7 +335,7 @@ const cardStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(80, 80, 80, 0.8)',
     alignSelf: 'flex-end',
-    overflow: 'hidden', // Added for BlurView
+    overflow: 'hidden',
   },
   streakText: {
     color: '#FFF',
@@ -358,14 +355,12 @@ const cardStyles = StyleSheet.create({
     fontSize: 12,
     fontWeight: 'bold'
   },
-
-  // --- STYLES FOR THE SELECTION OVERLAY ---
   selectionOverlay: {
-    ...StyleSheet.absoluteFillObject, // This makes it cover the whole card
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 20, // Match the card's border radius
-    overflow: 'hidden', // Ensure blur respects the radius
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -384,10 +379,10 @@ const cardStyles = StyleSheet.create({
     minHeight: 150,
   },
   failButton: {
-    backgroundColor: 'rgba(239, 68, 68, 0.8)', // Translucent Red
+    backgroundColor: 'rgba(239, 68, 68, 0.8)',
   },
   completeButton: {
-    backgroundColor: 'rgba(34, 197, 94, 0.8)', // Translucent Green
+    backgroundColor: 'rgba(34, 197, 94, 0.8)',
   },
   icon: {
     marginBottom: 12,
@@ -398,44 +393,39 @@ const cardStyles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
   },
-  // --- 3. NEW STYLES for Swipeable ---
   rightActionContainer: {
-    flexDirection: 'column', // <-- Changed from 'row' to 'column'
-    width: 120, // Adjust total width of the revealed area
-    height: 190, // Adjust total height to fit two buttons
-    marginTop: 55, // Adjust vertical position to align with card
-    marginRight: 17, // Keep right margin
-    marginLeft: 0, // No negative left margin needed now
-    gap: 10, // Space between the two buttons
-    borderRadius: 20, // Add a border-radius to the container itself if you want
-    overflow: 'hidden', // Crucial to clip inner button radii
+    flexDirection: 'column',
+    width: 120,
+    height: 190,
+    marginTop: 55,
+    marginRight: 17,
+    gap: 10,
+    borderRadius: 20,
+    overflow: 'hidden',
   },
   editButton: {
-    flex: 1, // Take up available vertical space
+    flex: 1,
     backgroundColor: '#FFF',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16, // Consistent border-radius for the button
-    paddingVertical: 10, // Adjust padding
-    marginRight: 0, // No horizontal margin
+    borderRadius: 16,
+    paddingVertical: 10,
   },
   deleteButton: {
-    flex: 1, // Take up available vertical space
-    backgroundColor: '#EF4444', // Red
+    flex: 1,
+    backgroundColor: '#EF4444',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 16, // Consistent border-radius for the button
-    paddingVertical: 10, // Adjust padding
-    marginRight: 0, // No horizontal margin
+    borderRadius: 16,
+    paddingVertical: 10,
   },
   actionButtonText: {
-    color: '#000', // Default to black for edit
+    color: '#000',
     fontWeight: '600',
     marginTop: 4,
-    fontSize: 12, // Make text a bit smaller
+    fontSize: 12,
   },
 });
-
 
 
 // -----------------------------------------------------------------
@@ -475,9 +465,106 @@ const tabStyles = StyleSheet.create({
   },
 });
 
+// -----------------------------------------------------------------
+// --- 4. NEW: EmptyState Component ---
+// -----------------------------------------------------------------
+function EmptyState({ selectedTab, totalHabitCount, onGetStarted, onViewProgress }) {
+
+  // Condition 1: No habits at all
+  if (totalHabitCount === 0) {
+    return (
+      <View style={emptyStyles.container}>
+        <Ionicons name="add-circle-outline" size={40} color="#fff" />
+        <Text style={emptyStyles.title}>No habit found</Text>
+        <Text style={emptyStyles.subtitle}>Create a new habit to track your progress</Text>
+        <TouchableOpacity
+          style={emptyStyles.button}
+          onPress={onGetStarted}
+        >
+          <Text style={emptyStyles.buttonText}>Get started</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Condition 2: To-dos are empty, but other habits exist
+  if (selectedTab === 'To-dos') {
+    return (
+      <View style={emptyStyles.container}>
+        <FontAwesome name="check" size={40} color="#FFF" style={cardStyles.icon} />
+        <Text style={emptyStyles.title}>No more habits left for today</Text>
+        <Text style={emptyStyles.subtitle}>You've done your part, review your journey.</Text>
+        <TouchableOpacity style={emptyStyles.button} onPress={onViewProgress}>
+          <Text style={emptyStyles.buttonText}>View Progress</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Condition 3: Done tab is empty
+  if (selectedTab === 'Done') {
+    return (
+      <View style={emptyStyles.container}>
+        <Ionicons name="trophy-outline" size={40} color="#fff" />
+        <Text style={emptyStyles.title}>No habits completed yet</Text>
+        <Text style={emptyStyles.subtitle}>Complete a habit from your "To-dos" list.</Text>
+      </View>
+    );
+  }
+
+  // Condition 4: Skipped tab is empty
+  if (selectedTab === 'Skipped') {
+    return (
+      <View style={emptyStyles.container}>
+        <MaterialCommunityIcons name="close-thick" size={40} color="#fff" />
+        <Text style={emptyStyles.title}>No habits skipped</Text>
+        <Text style={emptyStyles.subtitle}>Habits you fail will appear here.</Text>
+      </View>
+    );
+  }
+
+  return null; // Fallback
+}
+
+// --- 5. NEW: EmptyState Styles ---
+const emptyStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 140, // Push it down from the tabs
+    paddingHorizontal: 20,
+  },
+  title: {
+    color: '#FFF',
+    fontSize: 22,
+    fontWeight: '600',
+    marginTop: 16,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  subtitle: {
+    color: '#9CA3AF',
+    fontSize: 16,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  button: {
+    backgroundColor: '#FFF',
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 14,
+  },
+  buttonText: {
+    color: '#000',
+    fontSize: 16,
+    fontWeight: '600',
+  }
+});
+
 
 // -----------------------------------------------------------------
-// --- 4. Data Definitions ---
+// --- 6. Data Definitions ---
 // -----------------------------------------------------------------
 
 // --- Calendar Data (Mock) ---
@@ -491,7 +578,8 @@ const DATES = [
 const TODOS_DATA = [
   {
     id: '1',
-    title: '🥊 Boxing',
+    iconEmoji: '🥊',
+    title: 'Boxing',
     subtitle: 'Start strong, breathe deep, and hit the day with determination!',
     streak: '3 days',
     status: 'In Progress',
@@ -499,7 +587,8 @@ const TODOS_DATA = [
   },
   {
     id: '2',
-    title: '📈 Work',
+    iconEmoji: '📈',
+    title: 'Work',
     subtitle: 'Make today count.',
     streak: '3 days',
     status: 'In Progress',
@@ -507,7 +596,8 @@ const TODOS_DATA = [
   },
   {
     id: '3',
-    title: '🏋🏻 Exercise',
+    iconEmoji: '🏋🏻',
+    title: 'Exercise',
     subtitle: 'Stay active, stay consistent.',
     streak: '1 day',
     status: 'In Progress',
@@ -517,45 +607,35 @@ const TODOS_DATA = [
 
 
 // -----------------------------------------------------------------
-// --- 5. Main HomeScreen Component ---
+// --- 7. Main HomeScreen Component ---
 // -----------------------------------------------------------------
 function HomeScreen({ navigation, route }) {
   const [selectedDate, setSelectedDate] = useState(9);
   const [selectedTab, setSelectedTab] = useState('To-dos');
-
-  // State for habit lists
   const [todos, setTodos] = useState(TODOS_DATA);
   const [done, setDone] = useState([]);
   const [skipped, setSkipped] = useState([]);
-
-  // State for selected card ID
   const [selectedHabitId, setSelectedHabitId] = useState(null);
-
-  // --- 4. NEW: State for Swipeable ---
   const [openSwipeableId, setOpenSwipeableId] = useState(null);
-  const swipeableRefs = useRef({}); // Stores all swipeable refs
+  const swipeableRefs = useRef({});
 
-  // This effect listens for the 'newHabit' parameter
-  // --- MODIFIED: This effect now handles edits ---
+  // This effect listens for new/updated habits from CreateHabitScreen
   useEffect(() => {
-    // 1. Handle new habit
     if (route.params?.newHabit) {
       setTodos(prevTodos => [route.params.newHabit, ...prevTodos]);
       navigation.setParams({ newHabit: null });
     }
-
-    // 2. Handle updated habit
     if (route.params?.updatedHabit) {
       const updatedHabit = route.params.updatedHabit;
-
-      // Update the habit in whichever list it's in
       setTodos(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
       setDone(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
       setSkipped(prev => prev.map(h => h.id === updatedHabit.id ? updatedHabit : h));
-
       navigation.setParams({ updatedHabit: null });
     }
-  }, [route.params, navigation]); // Re-run when parameters change
+  }, [route.params, navigation]);
+
+  // --- NEW: Calculate total habits ---
+  const totalHabitCount = todos.length + done.length + skipped.length;
 
   const visibleHabits = useMemo(() => {
     if (selectedTab === 'To-dos') return todos;
@@ -565,7 +645,7 @@ function HomeScreen({ navigation, route }) {
   }, [selectedTab, todos, done, skipped]);
 
   const handleSelectCard = (habitId) => {
-    if (openSwipeableId) return; // Don't open overlay if card is swiped
+    if (openSwipeableId) return;
     setSelectedHabitId(selectedHabitId === habitId ? null : habitId);
   };
 
@@ -584,13 +664,12 @@ function HomeScreen({ navigation, route }) {
   };
 
   const handleResetHabit = (habit) => {
-    if (openSwipeableId) return; // Don't reset if card is swiped
+    if (openSwipeableId) return;
     setTodos(prev => [...prev, { ...habit, status: 'In Progress' }]);
     setDone(prev => prev.filter(h => h.id !== habit.id));
     setSkipped(prev => prev.filter(h => h.id !== habit.id));
   };
 
-  // --- 5. NEW: Handlers for Edit and Delete ---
   const handleDelete = (habit) => {
     Alert.alert(
       'Delete Habit',
@@ -601,7 +680,6 @@ function HomeScreen({ navigation, route }) {
           text: 'Delete',
           style: 'destructive',
           onPress: () => {
-            // Remove from all lists
             setTodos(prev => prev.filter(h => h.id !== habit.id));
             setDone(prev => prev.filter(h => h.id !== habit.id));
             setSkipped(prev => prev.filter(h => h.id !== habit.id));
@@ -612,14 +690,11 @@ function HomeScreen({ navigation, route }) {
     );
   };
 
-  // --- MODIFIED: This function now navigates ---
   const handleEdit = (habit) => {
-    closeSwipeable(habit.id); // Close the row
-    // Navigate to CreateHabitScreen and pass the habit data
+    closeSwipeable(habit.id);
     navigation.navigate('CreateHabit', { habitToEdit: habit });
   };
 
-  // --- 6. NEW: Helper to close a swiped card ---
   const closeSwipeable = (id) => {
     if (swipeableRefs.current[id]) {
       swipeableRefs.current[id].close();
@@ -627,23 +702,17 @@ function HomeScreen({ navigation, route }) {
     }
   };
 
-  // --- 7. NEW: Function to close other cards ---
   const onSwipeOpen = (id) => {
-    // Close the previously open card
     if (openSwipeableId && openSwipeableId !== id) {
       closeSwipeable(openSwipeableId);
     }
-    // Set the new open card
     setOpenSwipeableId(id);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
-
-      {/* 1. Ticker */}
       <HeaderQuoteScroll />
-
       <ScrollView style={styles.scrollView}>
 
         {/* Date and Create Button */}
@@ -651,8 +720,9 @@ function HomeScreen({ navigation, route }) {
           <Text style={styles.dateText}>THURSDAY, 09 OCT</Text>
           <TouchableOpacity
             style={styles.createButton}
-            onPress={() => navigation.navigate('CreateHabit')} // This navigates to the new screen
-          ><Text style={styles.createText}>CREATE</Text>
+            onPress={() => navigation.navigate('CreateHabit')}
+          >
+            <Text style={styles.createText}>CREATE</Text>
             <Ionicons name="add-circle" size={22} color="#FFF" />
           </TouchableOpacity>
         </View>
@@ -696,38 +766,40 @@ function HomeScreen({ navigation, route }) {
           />
         </View>
 
-        {/* --- To-Do Cards --- */}
-        {visibleHabits.map((todo) => {
-          const isTodoTab = selectedTab === 'To-dos';
-          return (
-            <HabitCard
-              key={todo.id}
-              habit={todo} // Pass the whole todo object
-              isSelected={isTodoTab && selectedHabitId === todo.id}
-              onPress={isTodoTab ? () => handleSelectCard(todo.id) : () => handleResetHabit(todo)}
-              onComplete={() => handleCompleteHabit(todo)}
-              onFail={() => handleFailHabit(todo)}
+        {/* --- MODIFIED: Conditional Rendering for List --- */}
+        {visibleHabits.length > 0 ? (
+          visibleHabits.map((todo) => {
+            const isTodoTab = selectedTab === 'To-dos';
+            return (
+              <HabitCard
+                key={todo.id}
+                habit={todo}
+                isSelected={isTodoTab && selectedHabitId === todo.id}
+                onPress={isTodoTab ? () => handleSelectCard(todo.id) : () => handleResetHabit(todo)}
+                onComplete={() => handleCompleteHabit(todo)}
+                onFail={() => handleFailHabit(todo)}
+                onDelete={() => handleDelete(todo)}
+                onEdit={() => handleEdit(todo)}
+                onSwipeOpen={() => onSwipeOpen(todo.id)}
+                swipeableRef={(ref) => {
+                  swipeableRefs.current[todo.id] = ref;
+                }}
+              />
+            );
+          })
+        ) : (
+          // --- Show EmptyState component if list is empty ---
+          <EmptyState
+            selectedTab={selectedTab}
+            totalHabitCount={totalHabitCount}
+            onGetStarted={() => navigation.navigate('CreateHabit')}
+            onViewProgress={() => setSelectedTab('Done')}
+          />
+        )}
 
-              // --- ADD THESE 4 MISSING PROPS ---
-              onDelete={() => handleDelete(todo)}
-              onEdit={() => handleEdit(todo)}
-              onSwipeOpen={() => onSwipeOpen(todo.id)}
-              swipeableRef={(ref) => {
-                swipeableRefs.current[todo.id] = ref;
-              }}
-            // --- END OF FIX ---
-            />
-          );
-        })}
-
-        {/* Add a little space at the bottom */}
         <View style={{ height: 20 }} />
 
       </ScrollView>
-
-      {/* 3. Bottom Tab Bar (Commented out) */}
-      {/* <BottomNavBar /> */}
-
     </SafeAreaView>
   );
 }
