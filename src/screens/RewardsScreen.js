@@ -252,33 +252,36 @@ import {
   SafeAreaView,
   FlatList,
   Image,
-  Modal, // <-- Import Modal
-  TouchableOpacity, // <-- Import TouchableOpacity
-  ImageBackground, // <-- Import ImageBackground
+  Modal,
+  TouchableOpacity,
+  ImageBackground,
 } from 'react-native';
-import { REWARD_IMAGES } from '../data/rewards'; // Import your new data file
-import { BlurView } from 'expo-blur'; // <-- Import BlurView
-import { Ionicons } from '@expo/vector-icons'; // <-- Import Ionicons
+import { REWARD_IMAGES } from '../data/rewards';
+import { BlurView } from 'expo-blur';
+import { Ionicons } from '@expo/vector-icons';
 
-// --- This is the new Modal Component ---
-const AchievementModal = ({ reward, onClose }) => {
-  if (!reward) return null; // Don't render if no reward is selected
+// --- MODIFIED: Modal now handles "isUnlocked" ---
+const AchievementModal = ({ reward, onClose, isUnlocked }) => {
+  if (!reward) return null;
 
   return (
     <Modal
-      animationType="slide"
+      animationType="fade" // Switched to fade
       transparent={true}
       visible={true}
       onRequestClose={onClose}
     >
-      {/* 1. Faded Background Image */}
       <ImageBackground source={reward.image} style={modalStyles.modalBackground}>
-        {/* 2. BlurView over the background */}
         <BlurView intensity={90} tint="dark" style={modalStyles.modalBlur}>
 
-          {/* 3. "New Achievement" Badge */}
-          <View style={modalStyles.badgeContainer}>
-            <Text style={modalStyles.badgeText}>New Achievement</Text>
+          {/* 3. "New Achievement" Badge (Dynamic) */}
+          <View style={[
+            modalStyles.badgeContainer,
+            !isUnlocked && modalStyles.badgeLocked // Style for "Locked"
+          ]}>
+            <Text style={modalStyles.badgeText}>
+              {isUnlocked ? 'New Achievement' : 'Locked'}
+            </Text>
           </View>
 
           {/* 4. Close Button */}
@@ -290,23 +293,42 @@ const AchievementModal = ({ reward, onClose }) => {
           <View style={modalStyles.contentContainer}>
             <Text style={modalStyles.title}>{reward.title}</Text>
 
-            {/* 6. Center Image */}
-            <View style={modalStyles.centerImageContainer}>
-              <Image source={reward.image} style={modalStyles.centerImage} />
+            {/* 6. Center Image (Dynamic opacity) */}
+            <View style={[
+              modalStyles.centerImageContainer,
+              !isUnlocked && modalStyles.lockedImage // Dims the locked image
+            ]}>
+              <Image
+                source={reward.image}
+                style={modalStyles.centerImage}
+              // resizeMode="cover" is default, which works with your zoom
+              />
             </View>
 
-            {/* 7. Quote Box */}
+            {/* 7. Quote Box (Dynamic content) */}
             <View style={modalStyles.quoteBox}>
+              {/* 1. Always show the quote */}
               <Text style={modalStyles.quoteText}>“{reward.quote}”</Text>
-              <Text style={modalStyles.conditionText}>
-                <Ionicons name="trophy" size={14} color="#FCD34D" />
+
+              {/* 2. Always show the *condition*, but style it differently */}
+              <Text style={[
+                modalStyles.conditionText,
+                !isUnlocked && modalStyles.lockedConditionText // New style for locked text
+              ]}>
+                {isUnlocked ? (
+                  <Ionicons name="trophy" size={14} color="#FCD34D" /> // Gold trophy
+                ) : (
+                  <Ionicons name="lock-closed" size={14} color="#9CA3AF" /> // Grey lock
+                )}
                 {' '}{reward.condition}
               </Text>
             </View>
 
-            {/* 8. "Got it" Button */}
+            {/* 8. "Got it" Button (Dynamic text) */}
             <TouchableOpacity style={modalStyles.gotItButton} onPress={onClose}>
-              <Text style={modalStyles.gotItButtonText}>Got it</Text>
+              <Text style={modalStyles.gotItButtonText}>
+                {isUnlocked ? 'Got it' : 'Back'}
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -318,16 +340,17 @@ const AchievementModal = ({ reward, onClose }) => {
 
 
 export default function RewardsScreen() {
-  // --- This is your state from the screenshot ---
   const [unlocked, setUnlocked] = useState(
-    new Set(['9', '11', '15', '27', '21'])
+    new Set(['7', '9', '11', '15', '21']) // Using your new Set
   );
 
-  // --- NEW: State for the modal ---
+  // --- MODIFIED: State for modal ---
   const [selectedReward, setSelectedReward] = useState(null);
+  const [isModalUnlocked, setIsModalUnlocked] = useState(false); // Track if tapped item is locked
 
-  const handleOpenModal = (reward) => {
+  const handleOpenModal = (reward, isUnlocked) => {
     setSelectedReward(reward);
+    setIsModalUnlocked(isUnlocked); // Store if it's locked or not
   };
 
   const handleCloseModal = () => {
@@ -339,11 +362,10 @@ export default function RewardsScreen() {
     const isUnlocked = unlocked.has(item.id);
 
     return (
-      // --- MODIFIED: Wrapped in TouchableOpacity ---
       <TouchableOpacity
         style={[styles.imageContainer, !isUnlocked && styles.locked]}
-        disabled={!isUnlocked} // Disable tap if locked
-        onPress={() => handleOpenModal(item)} // Open modal on press
+        // --- MODIFIED: Tap is no longer disabled ---
+        onPress={() => handleOpenModal(item, isUnlocked)}
         activeOpacity={0.7}
       >
         <Image
@@ -366,12 +388,17 @@ export default function RewardsScreen() {
         style={styles.list}
       />
 
-      {/* --- NEW: Render the modal component --- */}
-      <AchievementModal reward={selectedReward} onClose={handleCloseModal} />
+      {/* --- MODIFIED: Render the modal component --- */}
+      <AchievementModal
+        reward={selectedReward}
+        onClose={handleCloseModal}
+        isUnlocked={isModalUnlocked} // Pass the status to the modal
+      />
     </SafeAreaView>
   );
 }
 
+// --- Your Grid Styles (Unchanged) ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -391,7 +418,7 @@ const styles = StyleSheet.create({
   imageContainer: {
     flex: 1,
     aspectRatio: 1,
-    padding: 10,
+    padding: 10, // Your new padding
   },
   image: {
     width: '100%',
@@ -404,7 +431,7 @@ const styles = StyleSheet.create({
   },
 });
 
-// --- NEW: Styles for the Modal ---
+// --- MODIFIED: Modal Styles (Kept your "zoom" crop) ---
 const modalStyles = StyleSheet.create({
   modalBackground: {
     flex: 1,
@@ -424,6 +451,9 @@ const modalStyles = StyleSheet.create({
     borderRadius: 20,
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.2)',
+  },
+  badgeLocked: { // Style for the "Locked" badge
+    backgroundColor: 'rgba(100, 100, 100, 0.8)',
   },
   badgeText: {
     color: '#FFF',
@@ -452,14 +482,16 @@ const modalStyles = StyleSheet.create({
     borderRadius: 20,
     overflow: 'hidden',
     marginBottom: 24,
-
+    backgroundColor: '#000', // Added background for safety
   },
-  centerImage: {
-    width: '100%',
+  lockedImage: { // Style to dim the locked image
+    opacity: 0.6,
+  },
+  centerImage: { // Your "zoom" crop style
+    width: '110%',
     height: '110%',
     alignSelf: 'center',
-    top: '-5%', // Re-center the oversized image
-    // resizeMode: 'contain',
+    top: '-5%',
   },
   quoteBox: {
     backgroundColor: 'rgba(30, 30, 30, 0.9)',
@@ -468,6 +500,7 @@ const modalStyles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: 'rgba(255, 255, 255, 0.1)',
+    width: '100%', // Fill width
   },
   quoteText: {
     color: '#FFF',
@@ -482,6 +515,11 @@ const modalStyles = StyleSheet.create({
     fontWeight: '500',
     textAlign: 'center',
   },
+
+  lockedConditionText: {
+    color: '#9CA3AF', // Grey color for locked text
+  },
+
   gotItButton: {
     backgroundColor: '#FFF',
     borderRadius: 14,
