@@ -578,8 +578,7 @@ const DATES = [
 const TODOS_DATA = [
   {
     id: '1',
-    iconEmoji: '🥊',
-    title: 'Boxing',
+    title: '🥊 Boxing',
     subtitle: 'Start strong, breathe deep, and hit the day with determination!',
     streak: '3 days',
     status: 'In Progress',
@@ -587,8 +586,7 @@ const TODOS_DATA = [
   },
   {
     id: '2',
-    iconEmoji: '📈',
-    title: 'Work',
+    title: '📈 Work',
     subtitle: 'Make today count.',
     streak: '3 days',
     status: 'In Progress',
@@ -596,8 +594,7 @@ const TODOS_DATA = [
   },
   {
     id: '3',
-    iconEmoji: '🏋🏻',
-    title: 'Exercise',
+    title: '🏋🏻 Exercise',
     subtitle: 'Stay active, stay consistent.',
     streak: '1 day',
     status: 'In Progress',
