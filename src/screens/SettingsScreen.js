@@ -270,19 +270,19 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.statsBox}> {/* New container for the black box */}
             <View style={styles.statsContainer}>
               {/* Achievements */}
-              <View style={styles.statItem}>
+              <View style={[styles.statItem, styles.statItemFirst]}>
                 <Text style={styles.statIcon}>🏆</Text>
                 <Text style={styles.statValue}>6</Text>
                 <Text style={styles.statLabel}>Achievements</Text>
               </View>
               {/* Streaks */}
-              <View style={styles.statItem}>
+              <View style={[styles.statItem, styles.statItemMiddle]}>
                 <Text style={styles.statIcon}>🔥</Text>
                 <Text style={styles.statValue}>2 days</Text>
                 <Text style={styles.statLabel}>Streaks</Text>
               </View>
               {/* Wins */}
-              <View style={styles.statItem}>
+              <View style={[styles.statItem, styles.statItemLast]}>
                 <Text style={styles.statIcon}>✅</Text>
                 <Text style={styles.statValue}>45</Text>
                 <Text style={styles.statLabel}>Wins</Text>
@@ -453,16 +453,30 @@ const styles = StyleSheet.create({
 
   statsContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
     width: '100%',
     paddingTop: 16,
     paddingBottom: 16,
   },
   statItem: {
-    // flex: 1,
+    flex: 1,
     alignItems: 'center',
     gap: 4,
   },
+
+  statItemFirst: {
+    position: 'relative',
+    left: -5,
+  },
+
+  statItemMiddle: {
+    position: 'relative',
+    left: -25, // <-- Play with this value (e.g., -5)
+  },
+  statItemLast: {
+    position: 'relative',
+    left: -20, // <-- Play with this value (e.g., -10, -15)
+  },
+
   statIcon: { // New style for emoji
     fontSize: 20,
   },
