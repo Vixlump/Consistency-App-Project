@@ -15,20 +15,20 @@
 //   const [locationAccess, setLocationAccess] = useState(false);
 //   const [darkMode, setDarkMode] = useState(false);
 
-const handleLogout = () => {
-  Alert.alert(
-    'Logout',
-    'Are you sure you want to logout?',
-    [
-      { text: 'Cancel', style: 'cancel' },
-      {
-        text: 'Logout',
-        style: 'destructive',
-        onPress: () => navigation.navigate('Login')
-      },
-    ]
-  );
-};
+// const handleLogout = () => {
+//   Alert.alert(
+//     'Logout',
+//     'Are you sure you want to logout?',
+//     [
+//       { text: 'Cancel', style: 'cancel' },
+//       {
+//         text: 'Logout',
+//         style: 'destructive',
+//         onPress: () => navigation.navigate('Login')
+//       },
+//     ]
+//   );
+// };
 
 //   const SettingsItem = ({ icon, title, subtitle, rightElement, onPress }) => (
 //     <TouchableOpacity style={styles.settingsItem} onPress={onPress}>
@@ -245,13 +245,13 @@ export default function SettingsScreen({ navigation }) {
     <View style={styles.headerContainer}>
       <ImageBackground
         // --- UPDATED BACKGROUND IMAGE ---
-        source={require('../../assets/images/image 71.png')} // <-- Use image 71.png
+        source={require('../../assets/images/image 71.png')}
         style={styles.headerBackground}
         resizeMode="cover"
       >
         <View style={styles.headerOverlay}>
           <Image
-            source={require('../../assets/images/japan_icon.png')} // Keep your profile pic path
+            source={require('../../assets/images/japan_icon.png')}
             style={styles.profileImage}
           />
           {/* --- PROFILE TEXT CONTAINER (FOR LEFT ALIGN) --- */}
@@ -353,7 +353,7 @@ export default function SettingsScreen({ navigation }) {
           <View style={styles.sectionBody}>
             <TouchableOpacity
               style={[styles.row, styles.rowLast]}
-              onPress={handleLogout} // <-- UPDATE THIS LINE
+              onPress={handleLogout}
             >
               <View style={[styles.rowIconContainer, styles.logoutIconContainer]}>
                 <Ionicons name="log-out-outline" size={20} color="#EF4444" />
