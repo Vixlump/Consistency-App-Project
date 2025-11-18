@@ -33,6 +33,8 @@ import MapLogEditScreen from './src/screens/MapLogEditScreen';
 import MapLogDetailScreen from './src/screens/MapLogDetailScreen.js';
 import CreateHabitScreen from './src/screens/CreateHabitScreen';
 
+import HabitDetailScreen from './src/screens/HabitDetailScreen';
+
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -179,6 +181,15 @@ export default function App() {
               options={{
                 headerShown: false,
                 presentation: 'modal'
+              }}
+            />
+            
+            <Stack.Screen
+              name="HabitDetail"
+              component={HabitDetailScreen}
+              options={{
+                presentation: 'modal', // This makes it slide up like the screenshot
+                headerShown: false
               }}
             />
 

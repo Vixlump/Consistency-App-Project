@@ -449,7 +449,7 @@ const tabStyles = StyleSheet.create({
   tab: {
     paddingVertical: 8,
     paddingHorizontal: 16,
-    borderRadius: 20,
+    borderRadius: 10,
     borderWidth: 0.5,
     borderColor: '#FFF',
   },
