@@ -278,7 +278,7 @@ export default function SettingsScreen({ navigation }) {
               {/* Streaks */}
               <View style={[styles.statItem, styles.statItemMiddle]}>
                 <Text style={styles.statIcon}>🔥</Text>
-                <Text style={styles.statValue}>2 days</Text>
+                <Text style={styles.statValue}>2</Text>
                 <Text style={styles.statLabel}>Streaks</Text>
               </View>
               {/* Wins */}
@@ -403,19 +403,19 @@ const styles = StyleSheet.create({
 
   profileTextContainer: {
     alignSelf: 'flex-start', // Align to the left
-    marginBottom: 5, // Space between text and button
+    marginBottom: 2, // Space between text and button
   },
 
   profileName: { // New style
     color: '#FFF',
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 22,
+    fontWeight: '600',
     textAlign: 'left',
   },
   profileEmail: {
-    color: '#DDD', // Dimmer color
+    color: '#919191ff', // Dimmer color
     fontSize: 14, // Smaller size
-    fontWeight: '600',
+    fontWeight: '500',
     textAlign: 'left',
 
   },
@@ -465,16 +465,16 @@ const styles = StyleSheet.create({
 
   statItemFirst: {
     position: 'relative',
-    left: -5,
+    left: 10,
   },
 
   statItemMiddle: {
     position: 'relative',
-    left: -25, // <-- Play with this value (e.g., -5)
+    left: 0, // <-- Play with this value (e.g., -5)
   },
   statItemLast: {
     position: 'relative',
-    left: -20, // <-- Play with this value (e.g., -10, -15)
+    left: -10, // <-- Play with this value (e.g., -10, -15)
   },
 
   statIcon: { // New style for emoji
