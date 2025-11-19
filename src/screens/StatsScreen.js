@@ -231,6 +231,7 @@ import {
   ScrollView,
   TouchableOpacity,
   Image,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -238,7 +239,7 @@ import * as Haptics from 'expo-haptics';
 // --- 1. Helper Functions ---
 const getCurrentWeek = () => {
   const now = new Date();
-  const dayOfWeek = now.getDay(); 
+  const dayOfWeek = now.getDay(); // 0 (Sun) to 6 (Sat)
   const daysToSubtract = (dayOfWeek + 1) % 7;
   const startDate = new Date(now);
   startDate.setDate(now.getDate() - daysToSubtract);
@@ -266,12 +267,7 @@ const getCurrentYear = () => new Date().getFullYear().toString();
 const DAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const HEATMAP_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
-// --- 2. Initial Data ---
-// I set this to empty [] so you can see the image. 
-// Populate it to see the list again.
-const INITIAL_HABITS = []; 
-
-/* // Use this to test with data:
+// --- 2. Initial Data (Restored) ---
 const INITIAL_HABITS = [
   {
     id: '1',
@@ -280,13 +276,32 @@ const INITIAL_HABITS = [
     image: require('../../assets/images/work.png'),
     history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
   },
-  // ... other habits
+  {
+    id: '2',
+    title: 'Drink 3L water',
+    streak: 0,
+    image: require('../../assets/images/water2.png'),
+    history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
+  },
+  {
+    id: '3',
+    title: 'Boxing',
+    streak: 0,
+    image: require('../../assets/images/boxing.png'),
+    history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
+  },
+  {
+    id: '4',
+    title: 'Sleep early',
+    streak: 0,
+    image: require('../../assets/images/sleeping1.png'), 
+    history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
+  },
 ];
-*/
 
 // --- 3. Sub-Components ---
-// (WeeklyView, MonthlyGridView, YearlyHeatMapView, OverviewCard remain the same)
 
+// A. Weekly View (Checkboxes)
 const WeeklyView = ({ habit, weekData, onToggle }) => (
   <View style={styles.daysContainer}>
     {DAYS.map((day, index) => {
@@ -327,6 +342,7 @@ const WeeklyView = ({ habit, weekData, onToggle }) => (
   </View>
 );
 
+// B. Monthly Grid View
 const MonthlyGridView = () => {
   return (
     <View style={styles.monthlyGridContainer}>
@@ -350,6 +366,7 @@ const MonthlyGridView = () => {
   );
 };
 
+// C. Yearly Heatmap View
 const YearlyHeatMapView = () => {
   return (
     <View style={styles.yearlyContainer}>
@@ -362,7 +379,7 @@ const YearlyHeatMapView = () => {
         {Array.from({ length: 31 }).map((_, colIndex) => (
           <View key={colIndex} style={styles.yearlyColumn}>
             {Array.from({ length: 7 }).map((_, rowIndex) => {
-              const isActive = Math.random() > 0.5; 
+              const isActive = Math.random() > 0.85; 
               return (
                 <View 
                   key={rowIndex} 
@@ -380,6 +397,7 @@ const YearlyHeatMapView = () => {
   );
 };
 
+// D. Overview Card
 const OverviewCard = ({ habit, onPress, onLongPress, weekData, onToggle, selectedTab }) => {
   const isWeekly = selectedTab === 'Weekly';
   const isMonthly = selectedTab === 'Monthly';
@@ -389,8 +407,8 @@ const OverviewCard = ({ habit, onPress, onLongPress, weekData, onToggle, selecte
       style={[styles.card, isMonthly && styles.cardGrid]} 
       onPress={onPress} 
       onLongPress={onLongPress}
-      activeOpacity={0.7}
       delayLongPress={500}
+      activeOpacity={0.7}
     >
       <View style={styles.cardHeader}>
         <Image 
@@ -461,15 +479,11 @@ export default function StatsScreen({ navigation }) {
     setHabits(prev => prev.filter(h => h.id !== habitId));
   };
 
-  const handleEdit = (habit) => {
-    navigation.navigate('CreateHabit', { habitToEdit: habit });
-  };
-
   const showOptions = (habit) => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
       habit.title,
-      'Choose an action',
+      'Manage this habit',
       [
         { text: 'Delete Habit', style: 'destructive', onPress: () => handleDelete(habit.id) },
         { text: 'Cancel', style: 'cancel' },
@@ -496,10 +510,9 @@ export default function StatsScreen({ navigation }) {
         <Text style={styles.dateRange}>{headerTitle}</Text>
       </View>
 
-      {/* --- MODIFIED: Conditional Rendering for Empty State --- */}
+      {/* --- Empty State Logic --- */}
       {habits.length === 0 ? (
         <View style={styles.emptyContainer}>
-           {/* Make sure this path matches where you saved image_b1da21.png (or image 59) */}
            <Image 
              source={require('../../assets/images/image 59.png')} 
              style={styles.emptyImage}
@@ -575,18 +588,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 8,
   },
-  // --- New Styles for Empty State ---
+  // --- Empty State Styles ---
   emptyContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    paddingBottom: 100, // Push it up slightly
+    paddingBottom: 100, 
   },
   emptyImage: {
-    width: 180,
-    height: 180,
+    width: 150,
+    height: 150,
   },
-  // --------------------------------
+  // ------------------------
   scrollView: {
     flex: 1,
   },
@@ -730,7 +743,7 @@ const styles = StyleSheet.create({
     gap: 3, 
   },
   yearlyColumn: {
-    gap: 2, 
+    gap: 4, 
   },
   yearlyBox: {
     width: 8.2,
