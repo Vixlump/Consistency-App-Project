@@ -238,7 +238,7 @@ import * as Haptics from 'expo-haptics';
 // --- 1. Helper Functions ---
 const getCurrentWeek = () => {
   const now = new Date();
-  const dayOfWeek = now.getDay(); // 0 (Sun) to 6 (Sat)
+  const dayOfWeek = now.getDay(); 
   const daysToSubtract = (dayOfWeek + 1) % 7;
   const startDate = new Date(now);
   startDate.setDate(now.getDate() - daysToSubtract);
@@ -252,7 +252,7 @@ const getCurrentWeek = () => {
 
   const startStr = weekDates[0].toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
   const endStr = weekDates[6].toLocaleDateString('en-US', { day: 'numeric', month: 'short' });
-
+  
   return {
     dates: weekDates,
     dateRange: `${startStr} - ${endStr}`,
@@ -267,6 +267,11 @@ const DAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
 const HEATMAP_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 
 // --- 2. Initial Data ---
+// I set this to empty [] so you can see the image. 
+// Populate it to see the list again.
+const INITIAL_HABITS = []; 
+
+/* // Use this to test with data:
 const INITIAL_HABITS = [
   {
     id: '1',
@@ -275,32 +280,13 @@ const INITIAL_HABITS = [
     image: require('../../assets/images/work.png'),
     history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
   },
-  {
-    id: '2',
-    title: '3L water',
-    streak: 0,
-    image: require('../../assets/images/water2.png'),
-    history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
-  },
-  {
-    id: '3',
-    title: 'Boxing',
-    streak: 0,
-    image: require('../../assets/images/boxing.png'),
-    history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
-  },
-  {
-    id: '4',
-    title: 'Sleep early',
-    streak: 0,
-    image: require('../../assets/images/sleeping1.png'),
-    history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
-  },
+  // ... other habits
 ];
+*/
 
 // --- 3. Sub-Components ---
+// (WeeklyView, MonthlyGridView, YearlyHeatMapView, OverviewCard remain the same)
 
-// A. Weekly View (Checkboxes)
 const WeeklyView = ({ habit, weekData, onToggle }) => (
   <View style={styles.daysContainer}>
     {DAYS.map((day, index) => {
@@ -316,8 +302,8 @@ const WeeklyView = ({ habit, weekData, onToggle }) => (
             style={[
               styles.dayBox,
               !isChecked && styles.dayBoxUnchecked,
-              isToday && styles.dayBoxToday,
-              isChecked && styles.dayBoxChecked,
+              isToday && styles.dayBoxToday,     
+              isChecked && styles.dayBoxChecked, 
               isFuture && { opacity: 0.3 }
             ]}
             disabled={isFuture}
@@ -341,23 +327,22 @@ const WeeklyView = ({ habit, weekData, onToggle }) => (
   </View>
 );
 
-// B. Monthly Grid View
 const MonthlyGridView = () => {
   return (
     <View style={styles.monthlyGridContainer}>
       {Array.from({ length: 4 }).map((_, rowIndex) => (
         <View key={rowIndex} style={styles.monthlyGridRow}>
           {Array.from({ length: 7 }).map((_, colIndex) => {
-            const isActive = Math.random() > 0.6;
-            return (
-              <View
-                key={colIndex}
-                style={[
-                  styles.miniBox,
-                  isActive ? styles.miniBoxActive : styles.miniBoxInactive
-                ]}
-              />
-            );
+             const isActive = Math.random() > 0.7; 
+             return (
+               <View 
+                 key={colIndex} 
+                 style={[
+                   styles.miniBox, 
+                   isActive ? styles.miniBoxActive : styles.miniBoxInactive
+                 ]} 
+               />
+             );
           })}
         </View>
       ))}
@@ -365,30 +350,26 @@ const MonthlyGridView = () => {
   );
 };
 
-// C. NEW: Yearly Heatmap View
 const YearlyHeatMapView = () => {
   return (
     <View style={styles.yearlyContainer}>
-      {/* Labels */}
       <View style={styles.yearlyLabels}>
         {HEATMAP_LABELS.map((label, i) => (
           <Text key={i} style={styles.yearlyLabelText}>{label}</Text>
         ))}
       </View>
-
-      {/* Grid */}
       <View style={styles.yearlyGrid}>
         {Array.from({ length: 31 }).map((_, colIndex) => (
           <View key={colIndex} style={styles.yearlyColumn}>
             {Array.from({ length: 7 }).map((_, rowIndex) => {
-              const isActive = Math.random() > 0.5;
+              const isActive = Math.random() > 0.5; 
               return (
-                <View
-                  key={rowIndex}
+                <View 
+                  key={rowIndex} 
                   style={[
-                    styles.yearlyBox,
+                    styles.yearlyBox, 
                     isActive ? styles.miniBoxActive : styles.miniBoxInactive
-                  ]}
+                  ]} 
                 />
               );
             })}
@@ -399,34 +380,35 @@ const YearlyHeatMapView = () => {
   );
 };
 
-// D. Overview Card
-const OverviewCard = ({ habit, onPress, weekData, onToggle, selectedTab }) => {
+const OverviewCard = ({ habit, onPress, onLongPress, weekData, onToggle, selectedTab }) => {
   const isWeekly = selectedTab === 'Weekly';
   const isMonthly = selectedTab === 'Monthly';
-
+  
   return (
-    <TouchableOpacity
-      style={[styles.card, isMonthly && styles.cardGrid]}
-      onPress={onPress}
-      activeOpacity={0.9}
+    <TouchableOpacity 
+      style={[styles.card, isMonthly && styles.cardGrid]} 
+      onPress={onPress} 
+      onLongPress={onLongPress}
+      activeOpacity={0.7}
+      delayLongPress={500}
     >
       <View style={styles.cardHeader}>
-        <Image
-          source={habit.image}
-          style={[styles.cardImage, isMonthly && styles.cardImageGrid]}
+        <Image 
+          source={habit.image} 
+          style={[styles.cardImage, isMonthly && styles.cardImageGrid]} 
         />
-
+        
         <View style={styles.cardTitleContainer}>
-          <Text
-            style={[styles.cardTitle, isMonthly && styles.cardTitleGrid]}
+          <Text 
+            style={[styles.cardTitle, isMonthly && styles.cardTitleGrid]} 
             numberOfLines={1}
           >
             {habit.title}
           </Text>
           <View style={styles.streakContainer}>
             <Text style={{ fontSize: isWeekly ? 12 : 10 }}>🔥</Text>
-            <Text
-              style={[styles.streakText, isMonthly && styles.streakTextGrid]}
+            <Text 
+               style={[styles.streakText, isMonthly && styles.streakTextGrid]}
             >
               {habit.streak} Days
             </Text>
@@ -437,15 +419,12 @@ const OverviewCard = ({ habit, onPress, weekData, onToggle, selectedTab }) => {
       {selectedTab === 'Weekly' && (
         <WeeklyView habit={habit} weekData={weekData} onToggle={onToggle} />
       )}
-
       {selectedTab === 'Monthly' && (
         <MonthlyGridView />
       )}
-
       {selectedTab === 'Overall' && (
         <YearlyHeatMapView />
       )}
-
     </TouchableOpacity>
   );
 };
@@ -454,7 +433,7 @@ const OverviewCard = ({ habit, onPress, weekData, onToggle, selectedTab }) => {
 export default function StatsScreen({ navigation }) {
   const [selectedTab, setSelectedTab] = useState('Weekly');
   const [habits, setHabits] = useState(INITIAL_HABITS);
-
+  
   const weekData = useMemo(() => getCurrentWeek(), []);
   const currentMonth = useMemo(() => getCurrentMonth(), []);
   const currentYear = useMemo(() => getCurrentYear(), []);
@@ -478,12 +457,32 @@ export default function StatsScreen({ navigation }) {
     );
   };
 
+  const handleDelete = (habitId) => {
+    setHabits(prev => prev.filter(h => h.id !== habitId));
+  };
+
+  const handleEdit = (habit) => {
+    navigation.navigate('CreateHabit', { habitToEdit: habit });
+  };
+
+  const showOptions = (habit) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    Alert.alert(
+      habit.title,
+      'Choose an action',
+      [
+        { text: 'Delete Habit', style: 'destructive', onPress: () => handleDelete(habit.id) },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.segmentedControl}>
           {['Weekly', 'Monthly', 'Overall'].map((tab) => (
-            <TouchableOpacity
+            <TouchableOpacity 
               key={tab}
               style={[styles.segmentBtn, selectedTab === tab && styles.segmentBtnActive]}
               onPress={() => setSelectedTab(tab)}
@@ -497,25 +496,38 @@ export default function StatsScreen({ navigation }) {
         <Text style={styles.dateRange}>{headerTitle}</Text>
       </View>
 
-      <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={[
-          styles.scrollContent,
-          selectedTab === 'Monthly' && styles.scrollContentGrid
-        ]}
-      >
-        {habits.map((habit) => (
-          <OverviewCard
-            key={habit.id}
-            habit={habit}
-            weekData={weekData}
-            selectedTab={selectedTab}
-            onPress={() => navigation.navigate('HabitDetail', { habit: habit })}
-            onToggle={handleToggleHabit}
-          />
-        ))}
-        <View style={{ height: 20, width: '100%' }} />
-      </ScrollView>
+      {/* --- MODIFIED: Conditional Rendering for Empty State --- */}
+      {habits.length === 0 ? (
+        <View style={styles.emptyContainer}>
+           {/* Make sure this path matches where you saved image_b1da21.png (or image 59) */}
+           <Image 
+             source={require('../../assets/images/image 59.png')} 
+             style={styles.emptyImage}
+             resizeMode="contain"
+           />
+        </View>
+      ) : (
+        <ScrollView 
+          style={styles.scrollView}
+          contentContainerStyle={[
+            styles.scrollContent,
+            selectedTab === 'Monthly' && styles.scrollContentGrid
+          ]}
+        >
+          {habits.map((habit) => (
+            <OverviewCard
+              key={habit.id}
+              habit={habit}
+              weekData={weekData}
+              selectedTab={selectedTab} 
+              onPress={() => navigation.navigate('HabitDetail', { habit: habit })}
+              onToggle={handleToggleHabit}
+              onLongPress={() => showOptions(habit)}
+            />
+          ))}
+          <View style={{ height: 20, width: '100%' }} />
+        </ScrollView>
+      )}
     </SafeAreaView>
   );
 }
@@ -563,6 +575,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginTop: 8,
   },
+  // --- New Styles for Empty State ---
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 100, // Push it up slightly
+  },
+  emptyImage: {
+    width: 180,
+    height: 180,
+  },
+  // --------------------------------
   scrollView: {
     flex: 1,
   },
@@ -574,8 +598,6 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-
-  // --- Card Styles ---
   card: {
     backgroundColor: '#0B0B0B',
     borderRadius: 16,
@@ -583,44 +605,40 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#1F1F22',
-    width: '100%',
+    width: '100%', 
   },
   cardGrid: {
-    width: '48%',
-    padding: 12,
+    width: '48%', 
+    padding: 12,  
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
-
-  // --- Image Styles ---
   cardImage: {
-    width: 80,
+    width: 80,     
     height: 60,
     borderRadius: 6,
     marginRight: 12,
   },
-  cardImageGrid: {
-    // --- UPDATED: Made these bigger ---
-    width: 65,
+  cardImageGrid: { 
+    width: 65, 
     height: 48,
     marginRight: 8,
   },
-
   cardTitleContainer: {
     justifyContent: 'center',
     flex: 1,
   },
-  cardTitle: {
+  cardTitle: { 
     color: '#FFF',
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 4,
   },
-  cardTitleGrid: {
-    fontSize: 14.5,
+  cardTitleGrid: { 
+    fontSize: 14, 
     marginBottom: 2,
   },
   streakContainer: {
@@ -628,15 +646,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 4,
   },
-  streakText: {
+  streakText: { 
     color: '#E5E7EB',
-    fontSize: 14,
+    fontSize: 14, 
   },
-  streakTextGrid: {
+  streakTextGrid: { 
     fontSize: 11,
   },
-
-  // --- Weekly View Styles ---
   daysContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -657,7 +673,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayBoxUnchecked: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#1C1C1E', 
   },
   dayBoxChecked: {
     backgroundColor: '#FFF',
@@ -674,17 +690,15 @@ const styles = StyleSheet.create({
   dateTextToday: {
     color: '#FFF',
   },
-
-  // --- Monthly Grid View Styles ---
   monthlyGridContainer: {
-    gap: 7,
+    gap: 7, 
   },
   monthlyGridRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'space-between', 
   },
   miniBox: {
-    width: 20,
+    width: 20, 
     height: 20,
     borderRadius: 4,
   },
@@ -692,10 +706,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
   },
   miniBoxInactive: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: '#1C1C1E', 
   },
-
-  // --- Yearly View Styles ---
   yearlyContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -703,22 +715,22 @@ const styles = StyleSheet.create({
   yearlyLabels: {
     gap: 2,
     marginRight: 8,
-    paddingTop: 0,
+    paddingTop: 0, 
   },
   yearlyLabelText: {
     color: '#555',
     fontSize: 8,
-    height: 10,
+    height: 10, 
     lineHeight: 10,
     fontWeight: '700',
   },
   yearlyGrid: {
     flexDirection: 'row',
     flex: 1,
-    gap: 3,
+    gap: 3, 
   },
   yearlyColumn: {
-    gap: 4,
+    gap: 2, 
   },
   yearlyBox: {
     width: 8.2,
