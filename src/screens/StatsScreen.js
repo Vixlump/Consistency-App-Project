@@ -222,7 +222,6 @@
 //     textAlign: 'center',
 //   },
 // });
-
 import React, { useState, useMemo } from 'react';
 import {
   View,
@@ -236,7 +235,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
-// --- Helper function to get dynamic dates ---
+// --- 1. Helper Functions ---
 const getCurrentWeek = () => {
   const now = new Date();
   const dayOfWeek = now.getDay(); // 0 (Sun) to 6 (Sat)
@@ -261,9 +260,13 @@ const getCurrentWeek = () => {
   };
 };
 
-const DAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const getCurrentMonth = () => new Date().toLocaleDateString('en-US', { month: 'long' });
+const getCurrentYear = () => new Date().getFullYear().toString();
 
-// --- Initial Data ---
+const DAYS = ['Sat', 'Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+const HEATMAP_LABELS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+// --- 2. Initial Data ---
 const INITIAL_HABITS = [
   {
     id: '1',
@@ -274,7 +277,7 @@ const INITIAL_HABITS = [
   },
   {
     id: '2',
-    title: 'Drink 3L water',
+    title: '3L water',
     streak: 0,
     image: require('../../assets/images/water2.png'),
     history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
@@ -286,101 +289,188 @@ const INITIAL_HABITS = [
     image: require('../../assets/images/boxing.png'),
     history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
   },
+  {
+    id: '4',
+    title: 'Sleep early',
+    streak: 0,
+    image: require('../../assets/images/sleeping1.png'),
+    history: { 'Mon': false, 'Tue': false, 'Wed': false, 'Thu': false, 'Fri': false, 'Sat': false, 'Sun': false }
+  },
 ];
 
-// --- OverviewCard Component ---
-// Now accepts an 'onToggle' prop
-const OverviewCard = ({ habit, onPress, weekData, onToggle }) => {
+// --- 3. Sub-Components ---
+
+// A. Weekly View (Checkboxes)
+const WeeklyView = ({ habit, weekData, onToggle }) => (
+  <View style={styles.daysContainer}>
+    {DAYS.map((day, index) => {
+      const isToday = index === weekData.todayIndex;
+      const isFuture = index > weekData.todayIndex;
+      const dateNum = weekData.dates[index].getDate();
+      const isChecked = habit.history[day] === true;
+
+      return (
+        <View key={index} style={styles.dayColumn}>
+          <Text style={styles.dayText}>{day}</Text>
+          <TouchableOpacity
+            style={[
+              styles.dayBox,
+              !isChecked && styles.dayBoxUnchecked,
+              isToday && styles.dayBoxToday,
+              isChecked && styles.dayBoxChecked,
+              isFuture && { opacity: 0.3 }
+            ]}
+            disabled={isFuture}
+            onPress={(e) => {
+              e.stopPropagation();
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              onToggle(habit.id, day);
+            }}
+          >
+            {isChecked ? (
+              <Ionicons name="checkmark" size={16} color="#000" />
+            ) : (
+              <Text style={[styles.dateText, isToday && styles.dateTextToday]}>
+                {dateNum}
+              </Text>
+            )}
+          </TouchableOpacity>
+        </View>
+      );
+    })}
+  </View>
+);
+
+// B. Monthly Grid View
+const MonthlyGridView = () => {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
+    <View style={styles.monthlyGridContainer}>
+      {Array.from({ length: 4 }).map((_, rowIndex) => (
+        <View key={rowIndex} style={styles.monthlyGridRow}>
+          {Array.from({ length: 7 }).map((_, colIndex) => {
+            const isActive = Math.random() > 0.6;
+            return (
+              <View
+                key={colIndex}
+                style={[
+                  styles.miniBox,
+                  isActive ? styles.miniBoxActive : styles.miniBoxInactive
+                ]}
+              />
+            );
+          })}
+        </View>
+      ))}
+    </View>
+  );
+};
+
+// C. NEW: Yearly Heatmap View
+const YearlyHeatMapView = () => {
+  return (
+    <View style={styles.yearlyContainer}>
+      {/* Labels */}
+      <View style={styles.yearlyLabels}>
+        {HEATMAP_LABELS.map((label, i) => (
+          <Text key={i} style={styles.yearlyLabelText}>{label}</Text>
+        ))}
+      </View>
+
+      {/* Grid */}
+      <View style={styles.yearlyGrid}>
+        {Array.from({ length: 31 }).map((_, colIndex) => (
+          <View key={colIndex} style={styles.yearlyColumn}>
+            {Array.from({ length: 7 }).map((_, rowIndex) => {
+              const isActive = Math.random() > 0.5;
+              return (
+                <View
+                  key={rowIndex}
+                  style={[
+                    styles.yearlyBox,
+                    isActive ? styles.miniBoxActive : styles.miniBoxInactive
+                  ]}
+                />
+              );
+            })}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
+// D. Overview Card
+const OverviewCard = ({ habit, onPress, weekData, onToggle, selectedTab }) => {
+  const isWeekly = selectedTab === 'Weekly';
+  const isMonthly = selectedTab === 'Monthly';
+
+  return (
+    <TouchableOpacity
+      style={[styles.card, isMonthly && styles.cardGrid]}
+      onPress={onPress}
+      activeOpacity={0.9}
+    >
       <View style={styles.cardHeader}>
-        <Image source={habit.image} style={styles.cardImage} />
+        <Image
+          source={habit.image}
+          style={[styles.cardImage, isMonthly && styles.cardImageGrid]}
+        />
+
         <View style={styles.cardTitleContainer}>
-          <Text style={styles.cardTitle}>{habit.title}</Text>
+          <Text
+            style={[styles.cardTitle, isMonthly && styles.cardTitleGrid]}
+            numberOfLines={1}
+          >
+            {habit.title}
+          </Text>
           <View style={styles.streakContainer}>
-            <Text>🔥</Text>
-            <Text style={styles.streakText}>{habit.streak} Days</Text>
+            <Text style={{ fontSize: isWeekly ? 12 : 10 }}>🔥</Text>
+            <Text
+              style={[styles.streakText, isMonthly && styles.streakTextGrid]}
+            >
+              {habit.streak} Days
+            </Text>
           </View>
         </View>
       </View>
 
-      <View style={styles.daysContainer}>
-        {DAYS.map((day, index) => {
-          const isToday = index === weekData.todayIndex;
+      {selectedTab === 'Weekly' && (
+        <WeeklyView habit={habit} weekData={weekData} onToggle={onToggle} />
+      )}
 
-          // --- NEW: Check if this day is in the future ---
-          const isFuture = index > weekData.todayIndex;
+      {selectedTab === 'Monthly' && (
+        <MonthlyGridView />
+      )}
 
-          const dateNum = weekData.dates[index].getDate();
+      {selectedTab === 'Overall' && (
+        <YearlyHeatMapView />
+      )}
 
-          // Check the history
-          const isChecked = habit.history[day] === true;
-
-          return (
-            <View key={index} style={styles.dayColumn}>
-              <Text style={styles.dayText}>{day}</Text>
-
-              {/* --- CLICKABLE DAY BOX --- */}
-              <TouchableOpacity
-                style={[
-                  styles.dayBox,
-                  !isChecked && styles.dayBoxUnchecked,
-
-                  isToday && styles.dayBoxToday,
-                  isChecked && styles.dayBoxChecked,
-
-                  isFuture && { opacity: 0.5 }
-                ]}
-                // 1. Stop propagation so we don't open the detail modal
-                // 2. Call the toggle function
-                // --- Disable interaction if it's a future date ---
-                disabled={isFuture}
-                onPress={(e) => {
-                  e.stopPropagation();
-
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-                  onToggle(habit.id, day);
-                }}
-              >
-                {isChecked ? (
-                  <Ionicons name="checkmark" size={16} color="#000" />
-                ) : (
-                  <Text style={[styles.dateText, isToday && styles.dateTextToday]}>
-                    {dateNum}
-                  </Text>
-                )}
-              </TouchableOpacity>
-            </View>
-          );
-        })}
-      </View>
     </TouchableOpacity>
   );
 };
 
-// --- Main Stats Screen ---
+// --- 4. Main Screen ---
 export default function StatsScreen({ navigation }) {
-  const weekData = useMemo(() => getCurrentWeek(), []);
-
-  // 1. Convert HABITS to state so we can update it
+  const [selectedTab, setSelectedTab] = useState('Weekly');
   const [habits, setHabits] = useState(INITIAL_HABITS);
 
-  // 2. Function to handle check/uncheck
+  const weekData = useMemo(() => getCurrentWeek(), []);
+  const currentMonth = useMemo(() => getCurrentMonth(), []);
+  const currentYear = useMemo(() => getCurrentYear(), []);
+
+  let headerTitle = weekData.dateRange;
+  if (selectedTab === 'Monthly') headerTitle = currentMonth;
+  if (selectedTab === 'Overall') headerTitle = currentYear;
+
   const handleToggleHabit = (habitId, dayKey) => {
     setHabits(currentHabits =>
       currentHabits.map(habit => {
         if (habit.id === habitId) {
-          // Create a copy of the history object
           const newHistory = { ...habit.history };
-          // Flip the value (true -> false, false -> true)
           const wasChecked = newHistory[dayKey];
           newHistory[dayKey] = !wasChecked;
-
-          // Optional: Simple streak logic (add 1 if checking, remove 1 if unchecking)
-          // In a real app, you'd recalculate the full streak based on dates
           const newStreak = !wasChecked ? habit.streak + 1 : Math.max(0, habit.streak - 1);
-
           return { ...habit, history: newHistory, streak: newStreak };
         }
         return habit;
@@ -392,31 +482,39 @@ export default function StatsScreen({ navigation }) {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.segmentedControl}>
-          <TouchableOpacity style={[styles.segmentBtn, styles.segmentBtnActive]}>
-            <Text style={styles.segmentTextActive}>Weekly</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.segmentBtn}>
-            <Text style={styles.segmentText}>Monthly</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.segmentBtn}>
-            <Text style={styles.segmentText}>Overall</Text>
-          </TouchableOpacity>
+          {['Weekly', 'Monthly', 'Overall'].map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              style={[styles.segmentBtn, selectedTab === tab && styles.segmentBtnActive]}
+              onPress={() => setSelectedTab(tab)}
+            >
+              <Text style={selectedTab === tab ? styles.segmentTextActive : styles.segmentText}>
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
         </View>
-
-        <Text style={styles.dateRange}>{weekData.dateRange}</Text>
+        <Text style={styles.dateRange}>{headerTitle}</Text>
       </View>
 
-      <ScrollView style={styles.scrollView}>
+      <ScrollView
+        style={styles.scrollView}
+        contentContainerStyle={[
+          styles.scrollContent,
+          selectedTab === 'Monthly' && styles.scrollContentGrid
+        ]}
+      >
         {habits.map((habit) => (
           <OverviewCard
             key={habit.id}
             habit={habit}
             weekData={weekData}
+            selectedTab={selectedTab}
             onPress={() => navigation.navigate('HabitDetail', { habit: habit })}
-            onToggle={handleToggleHabit} // Pass the toggle function down
+            onToggle={handleToggleHabit}
           />
         ))}
-        <View style={{ height: 20 }} />
+        <View style={{ height: 20, width: '100%' }} />
       </ScrollView>
     </SafeAreaView>
   );
@@ -433,26 +531,24 @@ const styles = StyleSheet.create({
   },
   segmentedControl: {
     flexDirection: 'row',
-    // Removed backgroundColor and padding from here
-    borderRadius: 20, // Keep border radius for alignment
     alignSelf: 'flex-start',
     marginBottom: 16,
     gap: 10,
   },
   segmentBtn: {
-    paddingVertical: 6, // Increased vertical padding
-    paddingHorizontal: 20, // Increased horizontal padding
-    borderRadius: 10, // Slightly smaller border-radius for buttons
-    backgroundColor: '#000', // Default background for inactive buttons
-    borderWidth: 0.5, // Added border
-    borderColor: '#fff', // Border color for inactive buttons
+    paddingVertical: 6,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+    backgroundColor: '#000',
+    borderWidth: 0.5,
+    borderColor: '#fff',
   },
   segmentBtnActive: {
-    backgroundColor: '#FFF', // White background for active button
-    borderColor: '#FFF', // White border for active button
+    backgroundColor: '#FFF',
+    borderColor: '#FFF',
   },
   segmentText: {
-    color: '#DDD', // Lighter text for inactive buttons
+    color: '#DDD',
     fontSize: 13,
     fontWeight: '600',
   },
@@ -469,8 +565,17 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
     paddingHorizontal: 16,
   },
+  scrollContentGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+
+  // --- Card Styles ---
   card: {
     backgroundColor: '#0B0B0B',
     borderRadius: 16,
@@ -478,26 +583,45 @@ const styles = StyleSheet.create({
     marginBottom: 16,
     borderWidth: 1,
     borderColor: '#1F1F22',
+    width: '100%',
+  },
+  cardGrid: {
+    width: '48%',
+    padding: 12,
   },
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 16,
   },
+
+  // --- Image Styles ---
   cardImage: {
     width: 80,
     height: 60,
     borderRadius: 6,
     marginRight: 12,
   },
+  cardImageGrid: {
+    // --- UPDATED: Made these bigger ---
+    width: 65,
+    height: 48,
+    marginRight: 8,
+  },
+
   cardTitleContainer: {
     justifyContent: 'center',
+    flex: 1,
   },
   cardTitle: {
     color: '#FFF',
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 4,
+  },
+  cardTitleGrid: {
+    fontSize: 14.5,
+    marginBottom: 2,
   },
   streakContainer: {
     flexDirection: 'row',
@@ -508,6 +632,11 @@ const styles = StyleSheet.create({
     color: '#E5E7EB',
     fontSize: 14,
   },
+  streakTextGrid: {
+    fontSize: 11,
+  },
+
+  // --- Weekly View Styles ---
   daysContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -526,18 +655,17 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  dayBoxUnchecked: {
     backgroundColor: '#1C1C1E',
   },
   dayBoxChecked: {
     backgroundColor: '#FFF',
-    borderWidth: 0,
   },
   dayBoxToday: {
     backgroundColor: '#2A2A2C',
     borderWidth: 1,
     borderColor: '#555',
-  },
-  dayBoxUnchecked: {
   },
   dateText: {
     color: '#555',
@@ -545,5 +673,56 @@ const styles = StyleSheet.create({
   },
   dateTextToday: {
     color: '#FFF',
-  }
+  },
+
+  // --- Monthly Grid View Styles ---
+  monthlyGridContainer: {
+    gap: 7,
+  },
+  monthlyGridRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  miniBox: {
+    width: 20,
+    height: 20,
+    borderRadius: 4,
+  },
+  miniBoxActive: {
+    backgroundColor: '#FFF',
+  },
+  miniBoxInactive: {
+    backgroundColor: '#1C1C1E',
+  },
+
+  // --- Yearly View Styles ---
+  yearlyContainer: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+  },
+  yearlyLabels: {
+    gap: 2,
+    marginRight: 8,
+    paddingTop: 0,
+  },
+  yearlyLabelText: {
+    color: '#555',
+    fontSize: 8,
+    height: 10,
+    lineHeight: 10,
+    fontWeight: '700',
+  },
+  yearlyGrid: {
+    flexDirection: 'row',
+    flex: 1,
+    gap: 3,
+  },
+  yearlyColumn: {
+    gap: 4,
+  },
+  yearlyBox: {
+    width: 8.2,
+    height: 8.2,
+    borderRadius: 2,
+  },
 });

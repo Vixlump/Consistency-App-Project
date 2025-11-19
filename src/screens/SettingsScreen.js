@@ -240,11 +240,9 @@ const SettingsRow = ({ icon, name, isLast = false }) => (
 // --- Settings Screen Component ---
 export default function SettingsScreen({ navigation }) {
 
-  // --- 1. Profile Header (NOW INCLUDES STATS) ---
   const renderProfileHeader = () => (
     <View style={styles.headerContainer}>
       <ImageBackground
-        // --- UPDATED BACKGROUND IMAGE ---
         source={require('../../assets/images/image 71.png')}
         style={styles.headerBackground}
         resizeMode="cover"
