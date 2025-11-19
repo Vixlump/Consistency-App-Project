@@ -349,7 +349,7 @@ const MonthlyGridView = () => {
       {Array.from({ length: 4 }).map((_, rowIndex) => (
         <View key={rowIndex} style={styles.monthlyGridRow}>
           {Array.from({ length: 7 }).map((_, colIndex) => {
-             const isActive = Math.random() > 0.7; 
+             const isActive = Math.random() > 0.6; 
              return (
                <View 
                  key={colIndex} 
@@ -379,7 +379,7 @@ const YearlyHeatMapView = () => {
         {Array.from({ length: 31 }).map((_, colIndex) => (
           <View key={colIndex} style={styles.yearlyColumn}>
             {Array.from({ length: 7 }).map((_, rowIndex) => {
-              const isActive = Math.random() > 0.85; 
+              const isActive = Math.random() > 0.5; 
               return (
                 <View 
                   key={rowIndex} 
