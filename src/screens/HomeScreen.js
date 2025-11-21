@@ -844,7 +844,7 @@ const styles = StyleSheet.create({
   },
 
   scrollContent: {
-    paddingTop: 10, // Add a little padding so the first card isn't stuck to the tabs
+    paddingTop: 0, // Add a little padding so the first card isn't stuck to the tabs
   },
 
   header: {
