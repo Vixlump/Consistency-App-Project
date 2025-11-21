@@ -28,7 +28,6 @@ function HeaderQuoteScroll({
   messages = [
     'Better everyday',
     'Keep going',
-    'Push through it'
   ],
   separator = '     ✦     ',
   speed = 10,
@@ -133,6 +132,7 @@ function HabitCard({
   const { iconEmoji, title, subtitle, streak, imageSource, status } = habit;
   const isSkipped = status === 'Skipped';
   const isDone = status === 'Completed';
+
 
   const renderRightActions = (progress, dragX) => {
     const opacity = dragX.interpolate({
@@ -290,7 +290,7 @@ const cardStyles = StyleSheet.create({
   statusText: {
     color: '#FFF',
     fontWeight: 'bold',
-    fontSize: 12,
+    fontSize: 14,
   },
   bottomContentContainer: {
     width: '100%',
@@ -616,6 +616,23 @@ function HomeScreen({ navigation, route }) {
   const [openSwipeableId, setOpenSwipeableId] = useState(null);
   const swipeableRefs = useRef({});
 
+const getTodayDate = () => {
+  const date = new Date();
+
+  // 1. Get the day name (e.g., "FRIDAY")
+  const weekday = date.toLocaleDateString('en-US', { weekday: 'long' }).toUpperCase();
+
+  // 2. Get the day number and ensure it has a zero if needed (e.g., "09" or "21")
+  const dayNum = date.getDate().toString().padStart(2, '0');
+
+  // 3. Get the month name (e.g., "NOV")
+  const month = date.toLocaleDateString('en-US', { month: 'short' }).toUpperCase();
+
+  // 4. Combine them with your specific comma placement
+  return `${weekday}, ${dayNum} ${month}`;
+};
+  const todayString = getTodayDate(); // Returns "THURSDAY, 21 NOV" (for example)
+
   // This effect listens for new/updated habits from CreateHabitScreen
   useEffect(() => {
     if (route.params?.newHabit) {
@@ -716,7 +733,8 @@ function HomeScreen({ navigation, route }) {
 
         {/* Date and Create Button */}
         <View style={styles.header}>
-          <Text style={styles.dateText}>THURSDAY, 09 OCT</Text>
+          {/* <Text style={styles.dateText}>THURSDAY, 09 OCT</Text> */}
+          <Text style={styles.dateText}>{todayString}</Text>
           <TouchableOpacity
             style={styles.createButton}
             onPress={() => navigation.navigate('CreateHabit')}
@@ -828,7 +846,7 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingTop: 10, // Add a little padding so the first card isn't stuck to the tabs
   },
-  
+
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -838,7 +856,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     color: '#9CA3AF',
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: 'bold',
   },
   createButton: {
