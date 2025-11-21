@@ -221,7 +221,7 @@ import { ActivityIndicator } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 // --- 1. Import FontAwesome6 along with Ionicons ---
-import { Ionicons, FontAwesome6 } from '@expo/vector-icons';
+import { Ionicons, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image } from 'react-native';
 import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-fonts/inter';
@@ -295,7 +295,7 @@ function MainTabs() {
             // Note: Size 24 is standard for tabs. 12 is very small, but you can change it if needed.
             // <FontAwesome6 name="trophy" size={24} color={color} />
             // <Ionicons name="trophy-outline" size={24} color={color} />
-            <Ionicons name={focused ? "trophy" : "trophy-outline"} size={24} color={color} />
+            <Ionicons name={focused ? "trophy" : "trophy-outline"} size={26} color={color} />
           )
         }}
       />
@@ -341,7 +341,8 @@ function MainTabs() {
           tabBarIcon: ({ focused, color }) => (
             // Uses filled "settings" when focused
             // <Ionicons name="settings" size={24} color={color} />
-            <Ionicons name={focused ? "settings" : "settings-outline"} size={24} color={color} />
+            // <Ionicons name={focused ? "settings" : "settings-outline"} size={24} color={color} />
+            <MaterialCommunityIcons name={focused ? "account" : "account-outline"} size={28} color={color} />
 
           )
         }}
