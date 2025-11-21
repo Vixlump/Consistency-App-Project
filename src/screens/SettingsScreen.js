@@ -249,7 +249,7 @@ export default function SettingsScreen({ navigation }) {
       >
         <View style={styles.headerOverlay}>
           <Image
-            source={require('../../assets/images/japan_icon.png')}
+            source={require('../../assets/images/profile.png')}
             style={styles.profileImage}
           />
           {/* --- PROFILE TEXT CONTAINER (FOR LEFT ALIGN) --- */}
@@ -375,7 +375,7 @@ const styles = StyleSheet.create({
   },
   // --- Header Styles ---
   headerContainer: {
-    height: 300, // Increased height
+    height: 340, // Increased height
   },
   headerBackground: {
     flex: 1,
@@ -422,9 +422,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.4)', // Darker button
     paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingHorizontal: 14,
     borderRadius: 16,
-    marginTop: 10,
+    marginTop: 5,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
     alignSelf: 'flex-start', // Align to left
@@ -432,8 +432,9 @@ const styles = StyleSheet.create({
   },
   editProfileText: {
     color: '#DDD',
-    fontSize: 12,
+    fontSize: 14,
     marginRight: 6,
+
   },
   // --- Stats Bar Styles ---
 

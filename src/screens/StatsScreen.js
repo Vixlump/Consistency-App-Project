@@ -574,13 +574,13 @@ const styles = StyleSheet.create({
   },
   segmentText: {
     color: '#DDD',
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   segmentTextActive: {
     color: '#000',
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: 'bold',
   },
   dateRange: {
     color: '#FFF',

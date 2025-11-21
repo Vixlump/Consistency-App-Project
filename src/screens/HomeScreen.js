@@ -447,8 +447,8 @@ function TabButton({ label, isActive, onPress }) {
 // --- TabButton Styles ---
 const tabStyles = StyleSheet.create({
   tab: {
-    paddingVertical: 8,
-    paddingHorizontal: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
     borderRadius: 10,
     borderWidth: 0.5,
     borderColor: '#FFF',
@@ -459,6 +459,7 @@ const tabStyles = StyleSheet.create({
   tabText: {
     color: '#FFF',
     fontWeight: 'bold',
+    fontSize: 14,
   },
   activeTabText: {
     color: '#000',
