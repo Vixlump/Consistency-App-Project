@@ -709,8 +709,10 @@ function HomeScreen({ navigation, route }) {
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="light-content" />
+
       <HeaderQuoteScroll />
-      <ScrollView style={styles.scrollView}>
+
+      <View style={styles.fixedHeaderContainer}>
 
         {/* Date and Create Button */}
         <View style={styles.header}>
@@ -762,42 +764,46 @@ function HomeScreen({ navigation, route }) {
             onPress={() => setSelectedTab('Skipped')}
           />
         </View>
+      </View>
 
-        {/* --- MODIFIED: Conditional Rendering for List --- */}
-        {visibleHabits.length > 0 ? (
-          visibleHabits.map((todo) => {
-            const isTodoTab = selectedTab === 'To-dos';
-            return (
-              <HabitCard
-                key={todo.id}
-                habit={todo}
-                isSelected={isTodoTab && selectedHabitId === todo.id}
-                onPress={isTodoTab ? () => handleSelectCard(todo.id) : () => handleResetHabit(todo)}
-                onComplete={() => handleCompleteHabit(todo)}
-                onFail={() => handleFailHabit(todo)}
-                onDelete={() => handleDelete(todo)}
-                onEdit={() => handleEdit(todo)}
-                onSwipeOpen={() => onSwipeOpen(todo.id)}
-                swipeableRef={(ref) => {
-                  swipeableRefs.current[todo.id] = ref;
-                }}
-              />
-            );
-          })
-        ) : (
-          // --- Show EmptyState component if list is empty ---
-          <EmptyState
-            selectedTab={selectedTab}
-            totalHabitCount={totalHabitCount}
-            onGetStarted={() => navigation.navigate('CreateHabit')}
-            onViewProgress={() => setSelectedTab('Done')}
-          />
-        )}
+      {/* --- MODIFIED: Conditional Rendering for List --- */}
+      <ScrollView style={styles.scrollView} contentContainerStyle={styles.scrollContent}>
+        {
+          visibleHabits.length > 0 ? (
+            visibleHabits.map((todo) => {
+              const isTodoTab = selectedTab === 'To-dos';
+              return (
+                <HabitCard
+                  key={todo.id}
+                  habit={todo}
+                  isSelected={isTodoTab && selectedHabitId === todo.id}
+                  onPress={isTodoTab ? () => handleSelectCard(todo.id) : () => handleResetHabit(todo)}
+                  onComplete={() => handleCompleteHabit(todo)}
+                  onFail={() => handleFailHabit(todo)}
+                  onDelete={() => handleDelete(todo)}
+                  onEdit={() => handleEdit(todo)}
+                  onSwipeOpen={() => onSwipeOpen(todo.id)}
+                  swipeableRef={(ref) => {
+                    swipeableRefs.current[todo.id] = ref;
+                  }}
+                />
+              );
+            })
+          ) : (
+            // --- Show EmptyState component if list is empty ---
+            <EmptyState
+              selectedTab={selectedTab}
+              totalHabitCount={totalHabitCount}
+              onGetStarted={() => navigation.navigate('CreateHabit')}
+              onViewProgress={() => setSelectedTab('Done')}
+            />
+          )
+        }
 
         <View style={{ height: 20 }} />
 
-      </ScrollView>
-    </SafeAreaView>
+      </ScrollView >
+    </SafeAreaView >
   );
 }
 
@@ -807,9 +813,22 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#000000',
   },
+
+  // Wrapper for the sticky header elements
+  fixedHeaderContainer: {
+    backgroundColor: '#000000', // Ensure it has a background so cards scroll "behind" it
+    paddingBottom: 10,
+    zIndex: 10, // Ensure it stays on top
+  },
+
   scrollView: {
     flex: 1,
   },
+
+  scrollContent: {
+    paddingTop: 10, // Add a little padding so the first card isn't stuck to the tabs
+  },
+  
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
