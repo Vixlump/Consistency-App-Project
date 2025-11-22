@@ -575,7 +575,7 @@ const styles = StyleSheet.create({
     borderColor: '#FFF',
   },
   segmentText: {
-    color: '#DDD',
+    color: '#fff',
     fontSize: 14,
     fontWeight: 'bold',
   },
