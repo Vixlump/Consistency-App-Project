@@ -214,6 +214,7 @@
 //   },
 // });
 
+
 import 'react-native-gesture-handler';
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
@@ -228,6 +229,7 @@ import { useFonts, Inter_400Regular, Inter_600SemiBold } from '@expo-google-font
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from './src/utils/firebase';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { ThemeProvider } from './src/utils/ThemeContext';
 
 // Import Screens
 import LoginScreen from './src/screens/LoginScreen';
@@ -373,90 +375,92 @@ export default function App() {
   }
 
   return (
-    <View style={styles.container}>
-      <GestureHandlerRootView style={{ flex: 1 }}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Login">
+    <ThemeProvider>
+      <View style={styles.container}>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+          <NavigationContainer>
+            <Stack.Navigator initialRouteName="Login">
 
-            <Stack.Screen
-              name="Login"
-              component={LoginScreen}
-              options={{ headerShown: false }}
-            />
-            <Stack.Screen
-              name="SignUp"
-              component={SignUpScreen}
-              options={{ headerShown: false }}
-            />
+              <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{ headerShown: false }}
+              />
+              <Stack.Screen
+                name="SignUp"
+                component={SignUpScreen}
+                options={{ headerShown: false }}
+              />
 
-            {/* Main App Tabs */}
-            <Stack.Screen
-              name="Main"
-              component={MainTabs}
-              options={{ headerShown: false }}
-            />
+              {/* Main App Tabs */}
+              <Stack.Screen
+                name="Main"
+                component={MainTabs}
+                options={{ headerShown: false }}
+              />
 
-            {/* Helper Screens */}
-            <Stack.Screen
-              name="AddHabit"
-              component={AddHabitScreen}
-              options={{ title: 'Add New Habit' }}
-            />
-            <Stack.Screen
-              name="LocationPicker"
-              component={LocationPickerScreen}
-              options={{ title: 'Select Location' }}
-            />
-            <Stack.Screen
-              name="MapCamera"
-              component={MapCameraScreen}
-              options={{
-                headerShown: false,
-                presentation: 'fullScreenModal',
-                contentStyle: { backgroundColor: 'black' },
-              }}
-            />
-            <Stack.Screen
-              name="MapLogEdit"
-              component={MapLogEditScreen}
-              options={{
-                headerShown: false,
-                presentation: 'fullScreenModal',
-                contentStyle: { backgroundColor: 'black' },
-              }}
-            />
-            <Stack.Screen
-              name="MapUploadConfirm"
-              component={MapUploadConfirmScreen}
-              options={{ headerShown: false, presentation: 'containedModal' }}
-            />
-            <Stack.Screen
-              name="MapLogDetail"
-              component={MapLogDetailScreen}
-              options={{ headerShown: false, presentation: 'containedModal' }}
-            />
-            <Stack.Screen
-              name="CreateHabit"
-              component={CreateHabitScreen}
-              options={{
-                headerShown: false,
-                presentation: 'modal'
-              }}
-            />
-            <Stack.Screen
-              name="HabitDetail"
-              component={HabitDetailScreen}
-              options={{
-                presentation: 'modal',
-                headerShown: false
-              }}
-            />
+              {/* Helper Screens */}
+              <Stack.Screen
+                name="AddHabit"
+                component={AddHabitScreen}
+                options={{ title: 'Add New Habit' }}
+              />
+              <Stack.Screen
+                name="LocationPicker"
+                component={LocationPickerScreen}
+                options={{ title: 'Select Location' }}
+              />
+              <Stack.Screen
+                name="MapCamera"
+                component={MapCameraScreen}
+                options={{
+                  headerShown: false,
+                  presentation: 'fullScreenModal',
+                  contentStyle: { backgroundColor: 'black' },
+                }}
+              />
+              <Stack.Screen
+                name="MapLogEdit"
+                component={MapLogEditScreen}
+                options={{
+                  headerShown: false,
+                  presentation: 'fullScreenModal',
+                  contentStyle: { backgroundColor: 'black' },
+                }}
+              />
+              <Stack.Screen
+                name="MapUploadConfirm"
+                component={MapUploadConfirmScreen}
+                options={{ headerShown: false, presentation: 'containedModal' }}
+              />
+              <Stack.Screen
+                name="MapLogDetail"
+                component={MapLogDetailScreen}
+                options={{ headerShown: false, presentation: 'containedModal' }}
+              />
+              <Stack.Screen
+                name="CreateHabit"
+                component={CreateHabitScreen}
+                options={{
+                  headerShown: false,
+                  presentation: 'modal'
+                }}
+              />
+              <Stack.Screen
+                name="HabitDetail"
+                component={HabitDetailScreen}
+                options={{
+                  presentation: 'modal',
+                  headerShown: false
+                }}
+              />
 
-          </Stack.Navigator>
-        </NavigationContainer>
-      </GestureHandlerRootView>
-      <StatusBar style="light" />
-    </View>
+            </Stack.Navigator>
+          </NavigationContainer>
+        </GestureHandlerRootView>
+        <StatusBar style="light" />
+      </View>
+    </ThemeProvider>
   );
 }
 

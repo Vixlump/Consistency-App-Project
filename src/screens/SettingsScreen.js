@@ -211,7 +211,7 @@
 //     marginLeft: 8,
 //   },
 // });
-import React from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -221,24 +221,34 @@ import {
   Image,
   ImageBackground,
   TouchableOpacity,
-  Alert
+  Alert,
+  Modal,
+  TouchableWithoutFeedback
 } from 'react-native';
-// Import both icon packs
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../utils/ThemeContext'; // Ensure this path matches your project
 
-// --- Reusable Row Component ---
-const SettingsRow = ({ icon, name, isLast = false }) => (
-  <TouchableOpacity style={[styles.row, isLast && styles.rowLast]}>
-    <View style={styles.rowIconContainer}>
-      <Ionicons name={icon} size={20} color="#9CA3AF" />
-    </View>
-    <Text style={styles.rowText}>{name}</Text>
-    <Ionicons name="chevron-forward" size={20} color="#555" />
-  </TouchableOpacity>
-);
-
-// --- Settings Screen Component ---
 export default function SettingsScreen({ navigation }) {
+  const { theme, updateTheme, themeName } = useTheme(); 
+  const [isThemeModalVisible, setThemeModalVisible] = useState(false);
+
+  // --- Reusable Row Component ---
+  const SettingsRow = ({ icon, name, isLast = false, onPress }) => (
+    <TouchableOpacity 
+      style={[
+        styles.row, 
+        { borderBottomColor: theme.border }, 
+        isLast && styles.rowLast
+      ]}
+      onPress={onPress}
+    >
+      <View style={[styles.rowIconContainer, { backgroundColor: theme.iconBg }]}>
+        <Ionicons name={icon} size={20} color={theme.subText} />
+      </View>
+      <Text style={[styles.rowText, { color: theme.text }]}>{name}</Text>
+      <Ionicons name="chevron-forward" size={20} color={theme.subText} />
+    </TouchableOpacity>
+  );
 
   const renderProfileHeader = () => (
     <View style={styles.headerContainer}>
@@ -252,34 +262,30 @@ export default function SettingsScreen({ navigation }) {
             source={require('../../assets/images/profile.png')}
             style={styles.profileImage}
           />
-          {/* --- PROFILE TEXT CONTAINER (FOR LEFT ALIGN) --- */}
+          
           <View style={styles.profileTextContainer}>
-            <Text style={styles.profileName}>Consistener</Text>
-            <Text style={styles.profileEmail}>forexample@gmail.com</Text>
+            <Text style={[styles.profileName, { color: '#FFF' }]}>Consistener</Text>
+            <Text style={[styles.profileEmail, { color: '#DDD' }]}>forexample@gmail.com</Text>
           </View>
 
           <TouchableOpacity style={styles.editProfileButton}>
             <Text style={styles.editProfileText}>Edit Profile</Text>
-            {/* --- EDITED ICON --- */}
-            <Ionicons name="create-outline" size={16} color="#DDD" /> {/* Changed icon to 'create-outline' */}
+            <Ionicons name="create-outline" size={16} color="#DDD" />
           </TouchableOpacity>
 
-          {/* --- STATS BAR WITH NEW BOX & SHADOW --- */}
-          <View style={styles.statsBox}> {/* New container for the black box */}
+          {/* Stats Box */}
+          <View style={styles.statsBox}>
             <View style={styles.statsContainer}>
-              {/* Achievements */}
               <View style={[styles.statItem, styles.statItemFirst]}>
                 <Text style={styles.statIcon}>🏆</Text>
                 <Text style={styles.statValue}>6</Text>
                 <Text style={styles.statLabel}>Achievements</Text>
               </View>
-              {/* Streaks */}
               <View style={[styles.statItem, styles.statItemMiddle]}>
                 <Text style={styles.statIcon}>🔥</Text>
                 <Text style={styles.statValue}>2</Text>
                 <Text style={styles.statLabel}>Streaks</Text>
               </View>
-              {/* Wins */}
               <View style={[styles.statItem, styles.statItemLast]}>
                 <Text style={styles.statIcon}>✅</Text>
                 <Text style={styles.statValue}>45</Text>
@@ -287,7 +293,6 @@ export default function SettingsScreen({ navigation }) {
               </View>
             </View>
           </View>
-          {/* --- END STATS BAR --- */}
 
         </View>
       </ImageBackground>
@@ -295,206 +300,184 @@ export default function SettingsScreen({ navigation }) {
   );
 
   const handleLogout = () => {
-    Alert.alert(
-      'Logout',
-      'Are you sure you want to logout?',
-      [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          style: 'destructive',
-          onPress: () => navigation.navigate('Login')
-        },
-      ]
-    );
+    Alert.alert('Logout', 'Are you sure?', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Logout', style: 'destructive', onPress: () => navigation.navigate('Login') },
+    ]);
   };
 
+  // --- THEME SELECTION MODAL ---
+  const renderThemeModal = () => (
+    <Modal
+      visible={isThemeModalVisible}
+      transparent={true}
+      animationType="fade"
+      onRequestClose={() => setThemeModalVisible(false)}
+    >
+      <TouchableWithoutFeedback onPress={() => setThemeModalVisible(false)}>
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: theme.card }]}>
+            <Text style={[styles.modalTitle, { color: theme.text }]}>Choose Theme</Text>
+            
+            {/* REMOVED 'midnight' from this array */}
+            {['dark', 'light'].map((mode) => (
+              <TouchableOpacity 
+                key={mode}
+                style={[
+                  styles.themeOption, 
+                  { backgroundColor: themeName === mode ? theme.iconBg : 'transparent' }
+                ]}
+                onPress={() => {
+                  updateTheme(mode);
+                  setThemeModalVisible(false);
+                }}
+              >
+                <Text style={[
+                  styles.themeOptionText, 
+                  { color: theme.text, fontWeight: themeName === mode ? 'bold' : 'normal' }
+                ]}>
+                  {mode.charAt(0).toUpperCase() + mode.slice(1)}
+                </Text>
+                {themeName === mode && <Ionicons name="checkmark" size={20} color={theme.text} />}
+              </TouchableOpacity>
+            ))}
+          </View>
+        </View>
+      </TouchableWithoutFeedback>
+    </Modal>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]}>
       <ScrollView>
         {renderProfileHeader()}
-        {/* The renderStatsBar() call is removed from here */}
 
-        {/* --- 3. App Section --- */}
+        {/* App Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>App</Text>
-          <View style={styles.sectionBody}>
+          <Text style={[styles.sectionTitle, { color: theme.subText }]}>App</Text>
+          <View style={[styles.sectionBody, { backgroundColor: theme.card }]}>
             <SettingsRow icon="settings-outline" name="General" />
             <SettingsRow icon="notifications-outline" name="Remind me" />
-            <SettingsRow icon="color-palette-outline" name="Theme" />
+            
+            {/* --- CHANGED NAME TO JUST "Theme" --- */}
+            <SettingsRow 
+              icon="color-palette-outline" 
+              name="Theme" 
+              onPress={() => setThemeModalVisible(true)} 
+            />
+            
             <SettingsRow icon="archive-outline" name="Archived Habits" />
             <SettingsRow icon="swap-horizontal-outline" name="Data Import/Export" />
             <SettingsRow icon="reorder-four-outline" name="Reorder Habits" isLast />
           </View>
         </View>
 
-        {/* --- 4. Help Section --- */}
+        {/* Help Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Help</Text>
-          <View style={styles.sectionBody}>
+          <Text style={[styles.sectionTitle, { color: theme.subText }]}>Help</Text>
+          <View style={[styles.sectionBody, { backgroundColor: theme.card }]}>
             <SettingsRow icon="document-text-outline" name="Show What's New" />
             <SettingsRow icon="send-outline" name="Send feedback" isLast />
           </View>
         </View>
 
-        {/* --- 5. About Section --- */}
+        {/* About Section */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>About</Text>
-          <View style={styles.sectionBody}>
+          <Text style={[styles.sectionTitle, { color: theme.subText }]}>About</Text>
+          <View style={[styles.sectionBody, { backgroundColor: theme.card }]}>
             <SettingsRow icon="globe-outline" name="Website" />
             <SettingsRow icon="mail-outline" name="Contact Support" isLast />
           </View>
         </View>
 
-        {/* --- Logout Section --- */}
+        {/* Logout Section */}
         <View style={styles.section}>
-          <View style={styles.sectionBody}>
+          <View style={[styles.sectionBody, { backgroundColor: theme.card }]}>
             <TouchableOpacity
               style={[styles.row, styles.rowLast]}
               onPress={handleLogout}
             >
               <View style={[styles.rowIconContainer, styles.logoutIconContainer]}>
-                <Ionicons name="log-out-outline" size={20} color="#EF4444" />
+                <Ionicons name="log-out-outline" size={20} color={theme.danger} />
               </View>
-              <Text style={[styles.rowText, styles.logoutText]}>Logout</Text>
+              <Text style={[styles.rowText, { color: theme.danger }]}>Logout</Text>
             </TouchableOpacity>
           </View>
         </View>
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {renderThemeModal()}
+
     </SafeAreaView>
   );
 }
 
-// --- Styles for SettingsScreen ---
+// --- Styles ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#000',
   },
-  // --- Header Styles ---
-  headerContainer: {
-    height: 340, // Increased height
-  },
-  headerBackground: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
+  headerContainer: { height: 340 },
+  headerBackground: { flex: 1, justifyContent: 'flex-end' },
   headerOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)', // Darker overlay
+    backgroundColor: 'rgba(0,0,0,0.4)',
     justifyContent: 'flex-end',
-    // alignItems: 'center',
-    paddingHorizontal: 20, // <-- Add horizontal padding
-    paddingBottom: 20, // <-- Push content up from bottom
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   profileImage: {
     width: 80,
     height: 80,
     borderRadius: 40,
     marginBottom: 8,
-    marginTop: 40, // Pushes content down
-    alignSelf: 'flex-start', // Align to left
-    marginLeft: 0, // Remove left margin
+    marginTop: 40,
+    alignSelf: 'flex-start',
+    marginLeft: 0,
   },
-
-  profileTextContainer: {
-    alignSelf: 'flex-start', // Align to the left
-    marginBottom: 2, // Space between text and button
-  },
-
-  profileName: { // New style
-    color: '#FFF',
-    fontSize: 22,
-    fontWeight: '600',
-    textAlign: 'left',
-  },
-  profileEmail: {
-    color: '#919191ff', // Dimmer color
-    fontSize: 14, // Smaller size
-    fontWeight: '500',
-    textAlign: 'left',
-
-  },
+  profileTextContainer: { alignSelf: 'flex-start', marginBottom: 2 },
+  profileName: { fontSize: 22, fontWeight: '600', textAlign: 'left' },
+  profileEmail: { fontSize: 14, fontWeight: '500', textAlign: 'left' },
   editProfileButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.4)', // Darker button
+    backgroundColor: 'rgba(0,0,0,0.4)',
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 16,
     marginTop: 5,
     borderWidth: 1,
     borderColor: 'rgba(255,255,255,0.2)',
-    alignSelf: 'flex-start', // Align to left
+    alignSelf: 'flex-start',
     marginBottom: 10,
   },
-  editProfileText: {
-    color: '#DDD',
-    fontSize: 14,
-    marginRight: 6,
-
-  },
-  // --- Stats Bar Styles ---
-
+  editProfileText: { color: '#DDD', fontSize: 14, marginRight: 6 },
+  
+  // Stats Box
   statsBox: {
-    backgroundColor: 'rgba(0,0,0,0.25 )', // Black box with transparency
+    backgroundColor: 'rgba(0,0,0,0.25)',
     borderRadius: 10,
-    width: '100%', // Take full width
-    // --- DROPSHADOW ---
+    width: '100%',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.8,
     shadowRadius: 5,
-    elevation: 10, // Android shadow
+    elevation: 10,
   },
+  statsContainer: { flexDirection: 'row', width: '100%', paddingVertical: 16 },
+  statItem: { flex: 1, alignItems: 'center', gap: 4 },
+  statItemFirst: { left: 10 },
+  statItemMiddle: { left: 0 },
+  statItemLast: { left: -10 },
+  statIcon: { fontSize: 20 },
+  statValue: { color: '#FFF', fontSize: 14, fontWeight: '700' },
+  statLabel: { color: '#EEE', fontSize: 12 },
 
-  statsContainer: {
-    flexDirection: 'row',
-    width: '100%',
-    paddingTop: 16,
-    paddingBottom: 16,
-  },
-  statItem: {
-    flex: 1,
-    alignItems: 'center',
-    gap: 4,
-  },
-
-  statItemFirst: {
-    position: 'relative',
-    left: 10,
-  },
-
-  statItemMiddle: {
-    position: 'relative',
-    left: 0, // <-- Play with this value (e.g., -5)
-  },
-  statItemLast: {
-    position: 'relative',
-    left: -10, // <-- Play with this value (e.g., -10, -15)
-  },
-
-  statIcon: { // New style for emoji
-    fontSize: 20,
-  },
-  statValue: {
-    color: '#FFF',
-    fontSize: 14, // Larger text
-    fontWeight: '700',
-  },
-  statLabel: {
-    color: '#EEE', // Lighter text
-    fontSize: 12,
-  },
-  // --- Section/List Styles ---
-  section: {
-    paddingHorizontal: 16,
-    marginTop: 24,
-  },
+  // Sections
+  section: { paddingHorizontal: 16, marginTop: 24 },
   sectionTitle: {
-    color: '#9CA3AF',
     fontSize: 12,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -502,7 +485,6 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   sectionBody: {
-    backgroundColor: '#1C1C1E',
     borderRadius: 10,
     overflow: 'hidden',
   },
@@ -512,30 +494,49 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 0.5,
-    borderBottomColor: '#3A3A3C',
   },
-  rowLast: {
-    borderBottomWidth: 0,
-  },
+  rowLast: { borderBottomWidth: 0 },
   rowIconContainer: {
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#3A3A3C',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
-  rowText: {
+  rowText: { flex: 1, fontSize: 16 },
+  
+  // Logout
+  logoutIconContainer: { backgroundColor: 'rgba(239, 68, 68, 0.1)' },
+  
+  // Modal Styles
+  modalOverlay: {
     flex: 1,
-    color: '#FFF',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalContent: {
+    width: '80%',
+    borderRadius: 14,
+    padding: 20,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
+  themeOption: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 8,
+  },
+  themeOptionText: {
     fontSize: 16,
-  },
-  // --- Logout Styles ---
-  logoutIconContainer: {
-    backgroundColor: 'rgba(239, 68, 68, 0.1)', // Translucent red
-  },
-  logoutText: {
-    color: '#EF4444', // Red text
-  },
+  }
 });
