@@ -221,7 +221,6 @@ import { NavigationContainer } from '@react-navigation/native';
 import { ActivityIndicator } from 'react-native-paper';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-// --- 1. Import FontAwesome6 along with Ionicons ---
 import { Ionicons, FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, View, Image } from 'react-native';
@@ -231,7 +230,7 @@ import { auth } from './src/utils/firebase';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { ThemeProvider } from './src/utils/ThemeContext';
 
-// Import Screens
+//Import Screens
 import LoginScreen from './src/screens/LoginScreen';
 import SignUpScreen from './src/screens/SignUpScreen';
 import RewardsScreen from './src/screens/RewardsScreen';
