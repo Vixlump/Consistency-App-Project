@@ -40,7 +40,7 @@ export default function SignUpScreen({ navigation }) {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       console.log('User created:', userCredential.user);
-      navigation.navigate('Main');
+      navigation.navigate('Survey');
     } catch (error) {
       console.error('Sign up error:', error);
       let errorMessage = 'Failed to create account. Please try again.';
@@ -81,6 +81,7 @@ export default function SignUpScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor="rgba(255, 255, 255, 0.6)"
             value={email}
             onChangeText={setEmail}
             keyboardType="email-address"
@@ -90,6 +91,7 @@ export default function SignUpScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor="rgba(255, 255, 255, 0.6)"
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -98,6 +100,7 @@ export default function SignUpScreen({ navigation }) {
           <TextInput
             style={styles.input}
             placeholder="Confirm Password"
+            placeholderTextColor="rgba(255, 255, 255, 0.6)"
             value={confirmPassword}
             onChangeText={setConfirmPassword}
             secureTextEntry
@@ -110,7 +113,7 @@ export default function SignUpScreen({ navigation }) {
             disabled={loading}
           >
             {loading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color="#000" />
             ) : (
               <Text style={styles.signUpButtonText}>Create Account</Text>
             )}
@@ -134,7 +137,7 @@ export default function SignUpScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000',
   },
   scrollContainer: {
     flexGrow: 1,
@@ -146,50 +149,54 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   appName: {
-    fontSize: 28,
+    fontSize: 34,
     fontWeight: 'bold',
-    color: '#6366f1',
-    marginBottom: 10,
+    color: '#FFF',
+    marginBottom: 16,
+    textAlign: 'center',
   },
   tagline: {
     fontSize: 16,
-    color: '#6b7280',
+    color: 'rgba(255, 255, 255, 0.7)',
     textAlign: 'center',
   },
   form: {
     width: '100%',
   },
   input: {
-    backgroundColor: '#f9fafb',
+    backgroundColor: 'rgba(30, 30, 30, 0.9)',
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    padding: 16,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    borderRadius: 16,
+    padding: 20,
     marginBottom: 16,
     fontSize: 16,
+    color: '#FFF',
   },
   signUpButton: {
-    backgroundColor: '#6366f1',
-    borderRadius: 12,
-    padding: 16,
+    backgroundColor: '#FFF',
+    borderRadius: 14,
+    paddingVertical: 16,
     alignItems: 'center',
     marginTop: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   signUpButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
+    color: '#000',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
   loginLink: {
-    marginTop: 20,
+    marginTop: 24,
     alignItems: 'center',
   },
   loginText: {
-    color: '#6b7280',
-    fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.7)',
+    fontSize: 14,
   },
   loginBold: {
-    color: '#6366f1',
+    color: '#FCD34D',
     fontWeight: '600',
   },
   signUpButtonDisabled: {

@@ -246,6 +246,7 @@ import MapLogEditScreen from './src/screens/MapLogEditScreen';
 import MapLogDetailScreen from './src/screens/MapLogDetailScreen.js';
 import CreateHabitScreen from './src/screens/CreateHabitScreen';
 import HabitDetailScreen from './src/screens/HabitDetailScreen';
+import SurveyScreen from './src/screens/SurveyScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -453,6 +454,7 @@ export default function App() {
                   headerShown: false
                 }}
               />
+              <Stack.Screen name="Survey" component={SurveyScreen} />
 
             </Stack.Navigator>
           </NavigationContainer>
