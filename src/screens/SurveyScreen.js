@@ -63,21 +63,23 @@ export default function SurveyScreen({ navigation, route }) {
   };
 
   const handleAnswer = (answer, question) => {
-    setSurveyData(prev => ({
-      ...prev,
-      [question]: answer
-    }));
-    
-    if (currentPage < 2) {
-      goToNextPage();
-    } else {
-      setShowChallenge(true);
-      setTimeout(() => {
-        setShowChallenge(false);
-        setCurrentPage(3); 
-      }, 3000);
-    }
-  };
+  setSurveyData(prev => ({
+    ...prev,
+    [question]: answer
+  }));
+  
+  if (currentPage < 2) {
+    goToNextPage();
+  } else {
+    // Reset animation values before showing challenge
+    fadeAnim.setValue(0);
+    setShowChallenge(true);
+    setTimeout(() => {
+      setShowChallenge(false);
+      setCurrentPage(3); 
+    }, 1000);
+  }
+};
 
   const handleTaskSelect = (task) => {
     setSurveyData(prev => ({
@@ -93,19 +95,20 @@ export default function SurveyScreen({ navigation, route }) {
   };
 
   const handleComplete = async () => {
-    try {
-      // Save survey data locally
-      await AsyncStorage.setItem('userSurvey', JSON.stringify(surveyData));
-      
-      setShowMakingRoutines(true);
-      setTimeout(() => {
-        navigation.navigate('Main');
-      }, 2000);
-    } catch (error) {
-      console.error('Error saving survey:', error);
+  try {
+    await AsyncStorage.setItem('userSurvey', JSON.stringify(surveyData));
+    
+    // Reset animation values before showing routines
+    fadeAnim.setValue(0);
+    setShowMakingRoutines(true);
+    setTimeout(() => {
       navigation.navigate('Main');
-    }
-  };
+    }, 1000);
+  } catch (error) {
+    console.error('Error saving survey:', error);
+    navigation.navigate('Main');
+  }
+};
 
   const skipSurvey = () => {
     Alert.alert(
