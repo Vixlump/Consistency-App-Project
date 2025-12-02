@@ -233,7 +233,6 @@ export default function App() {
                 }}
               />
               <Stack.Screen name="Survey" component={SurveyScreen} options={{
-                  presentation: 'modal',
                   headerShown: false
                 }}/>
 

@@ -21,7 +21,7 @@ export default function SurveyScreen({ navigation, route }) {
   });
   const [showChallenge, setShowChallenge] = useState(false);
   const [showMakingRoutines, setShowMakingRoutines] = useState(false);
-  
+
   // Animation values
   const fadeAnim = new Animated.Value(0);
   const slideAnim = new Animated.Value(50);
@@ -31,15 +31,28 @@ export default function SurveyScreen({ navigation, route }) {
   useEffect(() => {
     if (currentPage === 0) {
       startIntroAnimation();
+
+      const timer = setTimeout(() => {
+        goToNextPage();
+      }, 3000); // 3 seconds
+
+      // Cleanup timer if user leaves screen early
+      return () => clearTimeout(timer);
     } else {
       animateProgress();
     }
   }, [currentPage]);
 
   const startIntroAnimation = () => {
-    Animated.sequence([
+    Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
+        duration: 1500,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
         duration: 1500,
         easing: Easing.out(Easing.cubic),
         useNativeDriver: true,
@@ -62,23 +75,37 @@ export default function SurveyScreen({ navigation, route }) {
     }).start();
   };
 
-  const handleAnswer = (answer, question) => {
-  setSurveyData(prev => ({
-    ...prev,
-    [question]: answer
-  }));
-  
-  if (currentPage < 2) {
-    goToNextPage();
-  } else {
-    // Reset animation values before showing challenge
-    fadeAnim.setValue(0);
-    setShowChallenge(true);
-    setTimeout(() => {
-      setShowChallenge(false);
-      setCurrentPage(3); 
-    }, 600);
-  }
+  // const handleAnswer = (answer, question) => {
+  //   setSurveyData(prev => ({
+  //     ...prev,
+  //     [question]: answer
+  //   }));
+
+  //   if (currentPage < 2) {
+  //     goToNextPage();
+  //   } else {
+  //     // Reset animation values before showing challenge
+  //     fadeAnim.setValue(0);
+  //     setShowChallenge(true);
+
+  //     Animated.timing(fadeAnim, {
+  //       toValue: 1,
+  //       duration: 1000, // Animate over 1 second
+  //       useNativeDriver: true,
+  //       easing: Easing.out(Easing.poly(4)), // Nice pop effect
+  //     }).start();
+
+  //     setTimeout(() => {
+  //       setShowChallenge(false);
+  //       setCurrentPage(3);
+  //     }, 1500);
+  //   }
+  // };
+
+  // Simpler version (No transition screen)
+const handleAnswer = (answer, question) => {
+  setSurveyData(prev => ({ ...prev, [question]: answer }));
+  goToNextPage();
 };
 
   const handleTaskSelect = (task) => {
@@ -95,20 +122,27 @@ export default function SurveyScreen({ navigation, route }) {
   };
 
   const handleComplete = async () => {
-  try {
-    await AsyncStorage.setItem('userSurvey', JSON.stringify(surveyData));
-    
-    // Reset animation values before showing routines
-    fadeAnim.setValue(0);
-    setShowMakingRoutines(true);
-    setTimeout(() => {
-      navigation.navigate('Main');
-    }, 600);
-  } catch (error) {
-    console.error('Error saving survey:', error);
-    navigation.navigate('Main');
-  }
-};
+    try {
+      await AsyncStorage.setItem('userSurvey', JSON.stringify(surveyData));
+
+      // Reset animation values before showing routines
+      fadeAnim.setValue(0);
+      setShowMakingRoutines(true);
+      setTimeout(() => {
+        // navigation.navigate('Main');
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        });
+      }, 600);
+    } catch (error) {
+      console.error('Error saving survey:', error);
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Main' }],
+      });
+    }
+  };
 
   const skipSurvey = () => {
     Alert.alert(
@@ -116,10 +150,15 @@ export default function SurveyScreen({ navigation, route }) {
       'Are you sure? This helps us personalize your experience.',
       [
         { text: 'Continue', style: 'cancel' },
-        { 
-          text: 'Skip', 
+        {
+          text: 'Skip',
           style: 'destructive',
-          onPress: () => navigation.navigate('Main')
+          onPress: () => {
+            navigation.reset({
+              index: 0,
+              routes: [{ name: 'Main' }],
+            });
+          }
         }
       ]
     );
@@ -135,7 +174,7 @@ export default function SurveyScreen({ navigation, route }) {
   if (currentPage === 0) {
     return (
       <View style={styles.container}>
-        <Animated.View 
+        <Animated.View
           style={[
             styles.introContainer,
             {
@@ -145,17 +184,15 @@ export default function SurveyScreen({ navigation, route }) {
           ]}
         >
           <Animated.Text style={[styles.introText, { opacity: textAnim }]}>
-            The best time to start is now.{'\n\n'}
-            {'\n\n'}
-            {'\n\n'}
+            The best time to start is now.
           </Animated.Text>
-          
-          <TouchableOpacity 
+
+          {/* <TouchableOpacity
             style={styles.continueButton}
             onPress={goToNextPage}
           >
             <Text style={styles.continueButtonText}>Begin Your Journey</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </Animated.View>
       </View>
     );
@@ -165,7 +202,7 @@ export default function SurveyScreen({ navigation, route }) {
   if (showChallenge) {
     return (
       <View style={styles.container}>
-        <Animated.View 
+        <Animated.View
           style={[
             styles.challengeContainer,
             {
@@ -184,15 +221,17 @@ export default function SurveyScreen({ navigation, route }) {
   if (showMakingRoutines) {
     return (
       <View style={styles.container}>
-        <Animated.View 
+        <Animated.View
           style={[
             styles.routinesContainer,
             {
               opacity: fadeAnim,
-              transform: [{ rotate: fadeAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: ['0deg', '360deg']
-              }) }]
+              transform: [{
+                rotate: fadeAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '360deg']
+                })
+              }]
             }
           ]}
         >
@@ -229,7 +268,7 @@ export default function SurveyScreen({ navigation, route }) {
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <Text style={styles.title}>Choose your tasks:</Text>
           <Text style={styles.subtitle}>Select the habits you want to focus on</Text>
-          
+
           <View style={styles.tasksGrid}>
             {tasks.map((task, index) => (
               <TouchableOpacity
@@ -250,7 +289,7 @@ export default function SurveyScreen({ navigation, route }) {
             ))}
           </View>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[
               styles.completeButton,
               surveyData.selectedTasks.length === 0 && styles.completeButtonDisabled
@@ -315,7 +354,7 @@ export default function SurveyScreen({ navigation, route }) {
 
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <Text style={styles.title}>{currentQuestion.question}</Text>
-        
+
         <View style={styles.answersContainer}>
           {currentQuestion.answers.map((answer, index) => (
             <TouchableOpacity
@@ -349,17 +388,17 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 10,
-    
+
   },
   skipButton: {
     alignSelf: 'flex-end',
-  marginBottom: 20,
-  backgroundColor: '#000',
-  paddingHorizontal: 16,
-  paddingVertical: 8,
-  borderRadius: 20,
-  borderWidth: 1,
-  borderColor: 'rgba(255, 255, 255, 0.2)',
+    marginBottom: 20,
+    backgroundColor: '#000',
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   skipText: {
     color: '#fff',
@@ -385,11 +424,10 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   introText: {
-    fontSize: 24,
+    fontSize: 20,
     color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
-    lineHeight: 36,
-    marginBottom: 50,
+    fontWeight: 'bold',
   },
   highlightText: {
     color: '#FFF',
