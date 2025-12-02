@@ -1,7 +1,6 @@
-// src/utils/logs.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// storage key (you can rename later if needed)
+// storage key
 const KEY = 'habit_logs_v1';
 
 /**
