@@ -77,7 +77,7 @@ export default function SurveyScreen({ navigation, route }) {
     setTimeout(() => {
       setShowChallenge(false);
       setCurrentPage(3); 
-    }, 1000);
+    }, 600);
   }
 };
 
@@ -103,7 +103,7 @@ export default function SurveyScreen({ navigation, route }) {
     setShowMakingRoutines(true);
     setTimeout(() => {
       navigation.navigate('Main');
-    }, 1000);
+    }, 600);
   } catch (error) {
     console.error('Error saving survey:', error);
     navigation.navigate('Main');
