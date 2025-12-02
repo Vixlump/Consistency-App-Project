@@ -13,15 +13,11 @@ import {
   Alert,
 } from 'react-native';
 
-// --- Icon Imports ---
 import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { Swipeable } from 'react-native-gesture-handler';
 
-// -----------------------------------------------------------------
-// --- 1. Ticker Component (HeaderQuoteScroll) ---
-// -----------------------------------------------------------------
 const REPEAT_COUNT = 4;
 
 function HeaderQuoteScroll({
@@ -94,7 +90,6 @@ function HeaderQuoteScroll({
   );
 }
 
-// --- Ticker Styles ---
 const tickerStyles = StyleSheet.create({
   clip: {
     overflow: 'hidden',
@@ -115,9 +110,6 @@ const tickerStyles = StyleSheet.create({
 });
 
 
-// -----------------------------------------------------------------
-// --- 2. HabitCard Component ---
-// -----------------------------------------------------------------
 function HabitCard({
   habit,
   isSelected,
@@ -247,7 +239,6 @@ function HabitCard({
   );
 }
 
-// --- Card Styles ---
 const cardStyles = StyleSheet.create({
   card: {
     height: 300,
@@ -428,9 +419,6 @@ const cardStyles = StyleSheet.create({
 });
 
 
-// -----------------------------------------------------------------
-// --- 3. TabButton Component ---
-// -----------------------------------------------------------------
 function TabButton({ label, isActive, onPress }) {
   return (
     <TouchableOpacity
@@ -466,9 +454,6 @@ const tabStyles = StyleSheet.create({
   },
 });
 
-// -----------------------------------------------------------------
-// --- 4. NEW: EmptyState Component ---
-// -----------------------------------------------------------------
 function EmptyState({ selectedTab, totalHabitCount, onGetStarted, onViewProgress }) {
 
   // Condition 1: No habits at all
@@ -527,7 +512,6 @@ function EmptyState({ selectedTab, totalHabitCount, onGetStarted, onViewProgress
   return null; // Fallback
 }
 
-// --- 5. NEW: EmptyState Styles ---
 const emptyStyles = StyleSheet.create({
   container: {
     flex: 1,
@@ -564,18 +548,12 @@ const emptyStyles = StyleSheet.create({
 });
 
 
-// -----------------------------------------------------------------
-// --- 6. Data Definitions ---
-// -----------------------------------------------------------------
-
-// --- Calendar Data (Mock) ---
 const DATES = [
   { id: 1, num: 5 }, { id: 2, num: 6 }, { id: 3, num: 7 },
   { id: 4, num: 8 }, { id: 5, num: 9 }, { id: 6, num: 10 },
   { id: 7, num: 11 },
 ];
 
-// --- To-Do Data (Mock) ---
 const TODOS_DATA = [
   {
     id: '1',

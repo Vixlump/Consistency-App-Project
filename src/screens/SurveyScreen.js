@@ -350,10 +350,16 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     alignSelf: 'flex-end',
-    marginBottom: 20,
+  marginBottom: 20,
+  backgroundColor: '#000',
+  paddingHorizontal: 16,
+  paddingVertical: 8,
+  borderRadius: 20,
+  borderWidth: 1,
+  borderColor: 'rgba(255, 255, 255, 0.2)',
   },
   skipText: {
-    color: 'rgba(255, 255, 255, 0.7)',
+    color: '#fff',
     fontSize: 16,
     fontWeight: '600',
   },

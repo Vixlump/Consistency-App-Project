@@ -232,7 +232,10 @@ export default function App() {
                   headerShown: false
                 }}
               />
-              <Stack.Screen name="Survey" component={SurveyScreen} />
+              <Stack.Screen name="Survey" component={SurveyScreen} options={{
+                  presentation: 'modal',
+                  headerShown: false
+                }}/>
 
             </Stack.Navigator>
           </NavigationContainer>
