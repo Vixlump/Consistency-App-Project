@@ -1,6 +1,3 @@
-// src/data/backgrounds.js
-
-// Based on your assets/images folder
 export const BACKGROUND_IMAGES = [
   { id: '1', image: require('../../assets/images/sleeping1.png') },
   { id: '2', image: require('../../assets/images/sleeping2.png') },

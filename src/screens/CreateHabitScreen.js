@@ -1,5 +1,4 @@
-// src/screens/CreateHabitScreen.js
-import React, { useState, useRef, useMemo, useEffect } from 'react'; // <-- Import useRef
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import {
     View,
     Text,
@@ -22,7 +21,7 @@ export default function CreateHabitScreen({ navigation, route }) {
     const habitToEdit = route.params?.habitToEdit;
     const isEditMode = !!habitToEdit;
 
-    // Pre-fill state if editing, otherwise use empty strings
+    // Pre-fill state if editing
     const [habitName, setHabitName] = useState(habitToEdit?.title || '');
     const [description, setDescription] = useState(habitToEdit?.subtitle || '');
     const [selectedImageSource, setSelectedImageSource] = useState(habitToEdit?.imageSource || BACKGROUND_IMAGES[0].image);
@@ -55,18 +54,16 @@ export default function CreateHabitScreen({ navigation, route }) {
 
     const onSave = () => {
         if (isEditMode) {
-            // --- We are EDITING ---
             const updatedHabit = {
-                ...habitToEdit, // Keep old data (id, streak, status)
+                ...habitToEdit,
                 title: habitName,
                 subtitle: description,
                 imageSource: selectedImageSource,
             };
-            // Send the *updated* habit back to HomeScreen
+            // Send the updated habit back to HomeScreen
             navigation.navigate('Home', { updatedHabit: updatedHabit });
 
         } else {
-            // --- We are CREATING ---
             const newHabit = {
                 id: String(Date.now()),
                 title: habitName,
@@ -75,12 +72,11 @@ export default function CreateHabitScreen({ navigation, route }) {
                 status: 'In Progress',
                 imageSource: selectedImageSource,
             };
-            // Send the *new* habit back to HomeScreen
+            // Send the new habit back to HomeScreen
             navigation.navigate('Home', { newHabit: newHabit });
         }
     };
 
-    // --- NEW: Memoize all images (custom + default) ---
     const allImages = useMemo(() => {
         const images = [...BACKGROUND_IMAGES];
         if (customImage) {
@@ -90,7 +86,6 @@ export default function CreateHabitScreen({ navigation, route }) {
         return images;
     }, [customImage]);
 
-    // --- NEW: Memoize the "pages" (chunked image array) ---
     const imagePages = useMemo(() => {
         const chunks = [];
         const CHUNK_SIZE = 6; // 6 images per page (2x3 grid)
@@ -100,7 +95,6 @@ export default function CreateHabitScreen({ navigation, route }) {
         return chunks;
     }, [allImages]);
 
-    // --- MODIFIED: Update pagination logic ---
     const updatePagination = (scrollX = 0) => {
         const viewWidth = viewWidthRef.current;
         if (viewWidth === 0) return;
@@ -114,7 +108,6 @@ export default function CreateHabitScreen({ navigation, route }) {
             setPagination({ page: currentPage, totalPages });
         }
     };
-    // --- END MODIFIED ---
 
     return (
         <SafeAreaView style={styles.container}>
@@ -122,8 +115,6 @@ export default function CreateHabitScreen({ navigation, route }) {
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
             >
-                {/* --- Header --- */}
-                {/* --- 5. Update Header Title --- */}
                 <View style={styles.header}>
                     <Text style={styles.headerTitle}>
                         {isEditMode ? 'Edit Habit' : 'Create Habit'}
@@ -134,7 +125,6 @@ export default function CreateHabitScreen({ navigation, route }) {
                 </View>
 
                 <ScrollView style={styles.scrollView}>
-                    {/* --- Habit Name --- */}
                     <Text style={styles.label}>HABIT NAME</Text>
                     <TextInput
                         style={styles.input}
@@ -144,7 +134,6 @@ export default function CreateHabitScreen({ navigation, route }) {
                         placeholderTextColor="#555"
                     />
 
-                    {/* --- Description --- */}
                     <Text style={styles.label}>DESCRIPTION</Text>
                     <TextInput
                         style={[styles.input, styles.descriptionInput]}
@@ -155,12 +144,11 @@ export default function CreateHabitScreen({ navigation, route }) {
                         multiline
                     />
 
-                    {/* --- Background --- */}
                     <Text style={styles.label}>BACKGROUND</Text>
 
                     <View style={styles.imagePagerContainer}>
 
-                        {/* --- NEW: Left Arrow Icon --- */}
+
                         {pagination.page > 0 && (
                             <Ionicons
                                 name="chevron-back"
@@ -170,16 +158,16 @@ export default function CreateHabitScreen({ navigation, route }) {
                                 pointerEvents="none"
                             />
                         )}
-                        {/* --- END NEW --- */}
+
                         <ScrollView
                             horizontal
                             showsHorizontalScrollIndicator={false}
-                            // --- MODIFIED: All props remain, just checking layout ---
+
                             pagingEnabled
                             decelerationRate="fast"
                             onLayout={(e) => {
                                 const width = e.nativeEvent.layout.width;
-                                setPageWidth(width); // <-- Set state
+                                setPageWidth(width);
                                 viewWidthRef.current = width;
                                 updatePagination();
                             }}
@@ -188,16 +176,15 @@ export default function CreateHabitScreen({ navigation, route }) {
                             }}
                             scrollEventThrottle={32}
                         >
-                            {/* --- NEW: Map over pages --- */}
+
                             {pageWidth > 0 && imagePages.map((page, pageIndex) => (
-                                // 1. Create a "page" View with the full width
+
                                 <View
                                     key={pageIndex}
                                     style={[styles.page, { width: pageWidth }]}
                                 >
-                                    {/* 2. Map over the 6 images in that page */}
                                     {page.map((bg) => {
-                                        // Check if this image is selected
+                      
                                         const isSelected = (selectedImageSource.uri && selectedImageSource.uri === bg.image.uri) || (selectedImageSource === bg.image);
                                         return (
                                             <TouchableOpacity
@@ -240,7 +227,7 @@ export default function CreateHabitScreen({ navigation, route }) {
                         </View>
                     )}
 
-                    {/* --- Import Button --- */}
+           
                     <View style={styles.importButtonWrapper}>
                         <TouchableOpacity style={styles.importButton} onPress={onImport}>
                             <Ionicons name="download-outline" size={20} color="#FFF" />
@@ -248,7 +235,6 @@ export default function CreateHabitScreen({ navigation, route }) {
                         </TouchableOpacity>
                     </View>
 
-                    {/* --- Advance Options --- */}
                     <Text style={styles.label}>ADVANCE OPTIONS</Text>
                     <View style={styles.optionsContainer}>
                         <TouchableOpacity style={styles.optionRow}>
@@ -271,7 +257,7 @@ export default function CreateHabitScreen({ navigation, route }) {
                     </View>
                 </ScrollView>
 
-                {/* --- Save Button --- */}
+ 
                 <View style={styles.saveButtonContainer}>
                     <TouchableOpacity style={styles.saveButton} onPress={onSave}>
                         <Text style={styles.saveButtonText}>Save</Text>
@@ -282,7 +268,6 @@ export default function CreateHabitScreen({ navigation, route }) {
     );
 }
 
-// --- Styles for CreateHabitScreen ---
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -327,14 +312,12 @@ const styles = StyleSheet.create({
         height: 100,
         textAlignVertical: 'top',
     },
-    // --- MODIFIED: Wrapper for ScrollView + Arrow ---
     imagePagerContainer: {
         position: 'relative',
         marginTop: 8,
         // This container has no padding, letting the ScrollView be full-width
     },
 
-    // --- NEW: This is the 2x3 grid style for each page ---
     page: {
         flexDirection: 'row',
         flexWrap: 'wrap',
@@ -343,7 +326,6 @@ const styles = StyleSheet.create({
         paddingHorizontal: 5,
     },
 
-    // --- MODIFIED: This is the style for a single image ---
     imageContainer: {
         width: '31%',     // Approx 1/3 width (31% * 3 + spacing)
         aspectRatio: 1,   // Makes it a perfect square
@@ -368,7 +350,6 @@ const styles = StyleSheet.create({
         zIndex: 10, // Add zIndex to make sure it's on top
     },
 
-    // --- ADD THIS NEW STYLE ---
     arrowIconLeft: {
         position: 'absolute',
         left: -16,
@@ -376,7 +357,7 @@ const styles = StyleSheet.create({
         marginTop: -20, // Match the right arrow
         zIndex: 10, // Add zIndex to make sure it's on top
     },
-    // --- END NEW STYLE ---
+
     paginationContainer: {
         flexDirection: 'row',
         justifyContent: 'center',

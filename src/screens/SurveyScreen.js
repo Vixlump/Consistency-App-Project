@@ -74,7 +74,7 @@ export default function SurveyScreen({ navigation, route }) {
       setShowChallenge(true);
       setTimeout(() => {
         setShowChallenge(false);
-        setCurrentPage(3); // Move to tasks selection
+        setCurrentPage(3); 
       }, 3000);
     }
   };

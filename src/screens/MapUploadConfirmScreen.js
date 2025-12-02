@@ -14,7 +14,7 @@ export default function MapUploadConfirmScreen({ route, navigation }) {
     const lng = coords?.lng ?? coords?.longitude;
 
     await addLog({
-      habitId: 'japan',         // <- will use your japan icon
+      habitId: 'japan',
       // title: title || 'Sauna',
       title: title,
       status: 'done',
@@ -27,10 +27,8 @@ export default function MapUploadConfirmScreen({ route, navigation }) {
 
     setDone(true);
     setTimeout(() => {
-      // go back ONE screen to Detail? or straight to Map:
-      // simplest: go back until you see the map
+  
       navigation.pop(3); // Camera -> Edit -> Confirm -> back to Map
-      // If your depth differs, tweak the number or use navigation.navigate('Map')
     }, 800);
   };
 
@@ -42,8 +40,8 @@ export default function MapUploadConfirmScreen({ route, navigation }) {
         <View style={s.cardWrap}>
           <View style={s.card}>
             <Text style={s.title}>{title || 'Untitled'}</Text>
-            <Text style={s.sub}>💬  {note || 'No note'}</Text>
-            <Text style={s.sub}>📍 {address}</Text>
+            <Text style={s.sub}>  {note || 'No note'}</Text>
+            <Text style={s.sub}>📍{address}</Text>
 
             <View style={{ height: 12 }} />
             <Pressable style={s.upload} onPress={onUpload}>
@@ -53,7 +51,7 @@ export default function MapUploadConfirmScreen({ route, navigation }) {
         </View>
       ) : (
         <BlurView intensity={40} tint="dark" style={s.overlay}>
-          <Text style={{ fontSize: 54, marginBottom: 8 }}>🔥</Text>
+          <Text style={{ fontSize: 54, marginBottom: 8 }}></Text>
           <Text style={{ color: '#fff', fontSize: 22, fontWeight: '800' }}>Upload completed</Text>
         </BlurView>
       )}

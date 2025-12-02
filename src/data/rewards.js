@@ -1,7 +1,3 @@
-// src/data/rewards.js
-// This file exports a list of all your reward images.
-// I've added title, quote, and condition to each item.
-
 export const REWARD_IMAGES = [
     // Row 1
     { id: '1', image: require('../../assets/images/reward-images/image 85.png'), title: 'Inner Peace', quote: 'The journey begins with a single, calm breath.', condition: 'Unlock 10 mindfulness sessions.' },
@@ -45,34 +41,33 @@ export const REWARD_IMAGES = [
     { id: '23', image: require('../../assets/images/reward-images/image 109.png'), title: 'Deep Dive', quote: 'Explore the depths of your mind.', condition: 'Complete 5 "Reading" habits.' },
     { id: '24', image: require('../../assets/images/reward-images/image 105.png'), title: 'Cosmic', quote: 'You are made of stardust.', condition: 'Complete 3 "Meditation" habits.' },
 
-    // Row 7 (Duplicates as requested)
+    // Row 7
     { id: '25', image: require('../../assets/images/reward-images/image 65.png'), title: 'Urban Explorer', quote: 'Even in the city, there is nature to be found.', condition: 'Log 3 outdoor activities.' },
     { id: '26', image: require('../../assets/images/reward-images/image 66.png'), title: 'Field of Dreams', quote: 'What you plant now, you will harvest later.', condition: 'Start 5 new habits.' },
     { id: '27', image: require('../../assets/images/reward-images/image 85.png'), title: 'Inner Peace', quote: 'The journey begins with a single, calm breath.', condition: 'Unlock 10 mindfulness sessions.' },
     { id: '28', image: require('../../assets/images/reward-images/image 81.png'), title: 'New Horizons', quote: 'Look ahead, the sky is not the limit.', condition: 'Complete your first week of goals.' },
-    // --- 4 NEW RANDOM ROWS (NO DUPLICATES IN-ROW) ---
 
     // Row 8
     { id: '29', image: require('../../assets/images/reward-images/image 76.png') },
     { id: '30', image: require('../../assets/images/reward-images/image 95.png') },
     { id: '31', image: require('../../assets/images/reward-images/image 104.png') },
-    { id: '32', image: require('../../assets/images/reward-images/image 107.png') }, // (No duplicates)
+    { id: '32', image: require('../../assets/images/reward-images/image 107.png') },
 
     // Row 9
     { id: '33', image: require('../../assets/images/reward-images/image 80.png') },
     { id: '34', image: require('../../assets/images/reward-images/image 105.png') },
     { id: '35', image: require('../../assets/images/reward-images/image 84.png') },
-    { id: '36', image: require('../../assets/images/reward-images/image 90.png') }, // (No duplicates)
+    { id: '36', image: require('../../assets/images/reward-images/image 90.png') },
 
     // Row 10
     { id: '37', image: require('../../assets/images/reward-images/image 66.png') },
     { id: '38', image: require('../../assets/images/reward-images/image 102.png') },
-    { id: '39', image: require('../../assets/images/reward-images/image 92.png') }, // <-- FIXED (was 66)
+    { id: '39', image: require('../../assets/images/reward-images/image 92.png') },
     { id: '40', image: require('../../assets/images/reward-images/image 97.png') },
 
     // Row 11
     { id: '41', image: require('../../assets/images/reward-images/image 88.png') },
     { id: '42', image: require('../../assets/images/reward-images/image 99.png') },
     { id: '43', image: require('../../assets/images/reward-images/image 85.png') },
-    { id: '44', image: require('../../assets/images/reward-images/image 65.png') }, // (No duplicates)
+    { id: '44', image: require('../../assets/images/reward-images/image 65.png') },
 ];

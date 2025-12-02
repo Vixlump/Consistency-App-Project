@@ -2,7 +2,6 @@ import React, { createContext, useState, useContext, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { StatusBar } from 'react-native';
 
-// 1. Define your Color Palettes
 const themes = {
   dark: {
     type: 'dark',
