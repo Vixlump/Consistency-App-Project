@@ -269,7 +269,7 @@ const styles = StyleSheet.create({
   nameplateText: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#FFF',
+    color: '#fff',
     textAlign: 'center',
     textShadowColor: 'rgba(255, 255, 255, 0.8)',
     textShadowOffset: { width: 0, height: 0 },
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   signUpBold: {
-    color: '#FCD34D',
+    color: '#FFF',
     fontWeight: '600',
   },
 });

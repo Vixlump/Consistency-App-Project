@@ -142,10 +142,9 @@ export default function SurveyScreen({ navigation, route }) {
           ]}
         >
           <Animated.Text style={[styles.introText, { opacity: textAnim }]}>
-            You were just another face in the crowd.{'\n\n'}
-            Tired. Stuck.{'\n\n'}
-            Running on autopilot...{'\n\n'}
-            <Text style={styles.highlightText}>until now.</Text>
+            The best time to start is now.{'\n\n'}
+            {'\n\n'}
+            {'\n\n'}
           </Animated.Text>
           
           <TouchableOpacity 
@@ -347,6 +346,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 10,
+    
   },
   skipButton: {
     alignSelf: 'flex-end',
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     height: 4,
-    backgroundColor: '#FCD34D',
+    backgroundColor: '#FFF',
     borderRadius: 2,
   },
   scrollContainer: {
@@ -383,7 +383,7 @@ const styles = StyleSheet.create({
     marginBottom: 50,
   },
   highlightText: {
-    color: '#FCD34D',
+    color: '#FFF',
     fontWeight: 'bold',
   },
   continueButton: {
@@ -424,7 +424,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   answerButtonSelected: {
-    borderColor: '#FCD34D',
+    borderColor: '#FFF',
     backgroundColor: 'rgba(252, 211, 77, 0.1)',
   },
   answerText: {
@@ -434,7 +434,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   answerTextSelected: {
-    color: '#FCD34D',
+    color: '#FFF',
   },
   // Task selection styles
   tasksGrid: {
@@ -453,7 +453,7 @@ const styles = StyleSheet.create({
     width: '48%',
   },
   taskButtonSelected: {
-    borderColor: '#FCD34D',
+    borderColor: '#FFF',
     backgroundColor: 'rgba(252, 211, 77, 0.1)',
   },
   taskText: {
@@ -463,7 +463,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   taskTextSelected: {
-    color: '#FCD34D',
+    color: '#FFF',
   },
   completeButton: {
     backgroundColor: '#FFF',
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   challengeText: {
     fontSize: 36,
     fontWeight: 'bold',
-    color: '#FCD34D',
+    color: '#FFF',
     textAlign: 'center',
   },
   routinesContainer: {

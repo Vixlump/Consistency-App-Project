@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   loginBold: {
-    color: '#FCD34D',
+    color: '#FFF',
     fontWeight: '600',
   },
   signUpButtonDisabled: {
